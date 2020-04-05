@@ -8,7 +8,9 @@
     "ios": "react-native run-ios",
     "start": "react-native start",
     "test": "jest",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "patch-package": "patch-package",
+    "postinstall": "patch-package"
   },
   "dependencies": {
     "react": "16.9.0",
@@ -24,6 +26,7 @@
     "eslint": "^6.5.1",
     "jest": "^24.9.0",
     "metro-react-native-babel-preset": "^0.56.0",
+    "patch-package": "^6.2.2",
     "react-test-renderer": "16.9.0",
     "rnpm-plugin-windows": "^0.6.1"
   },
