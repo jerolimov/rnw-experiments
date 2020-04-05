@@ -9,7 +9,8 @@
   },
   "dependencies": {
     "react": "16.8.6",
-    "react-native": "0.60.0"
+    "react-native": "^0.60.0-0",
+    "react-native-windows": "^0.60.0-vnext.157"
   },
   "devDependencies": {
     "@babel/core": "^7.3.3",
