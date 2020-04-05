@@ -27,7 +27,7 @@ jobs:
       run: npm run react-native -- run-windows --info
       working-directory: 0.61.0-beta
 
-  build-0_62_2:
+  build-0_61_2:
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v2
