@@ -39,6 +39,18 @@ jobs:
       run: npm run react-native -- run-windows --info
       working-directory: 0.61.2
 
+  build-rnw-0_60_0-vnext-with-dnd-patches:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v1
+    - name: npm install
+      run: npm install
+      working-directory: rnw-0.60.0-vnext-with-dnd-patches
+    - name: react-native run-windows --info
+      run: npm run react-native -- run-windows --info
+      working-directory: rnw-0.60.0-vnext-with-dnd-patches
+
   build-rnw-0_61_2-with-dnd-patches:
     runs-on: windows-latest
     steps:
