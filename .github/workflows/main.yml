@@ -26,3 +26,15 @@ jobs:
     - name: react-native run-windows --info
       run: npm run react-native -- run-windows --info
       working-directory: 0.61.0-beta
+
+  build-0.62.2:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v1
+    - name: npm install
+      run: npm install
+      working-directory: 0.61.2
+    - name: react-native run-windows --info
+      run: npm run react-native -- run-windows --info
+      working-directory: 0.61.2
