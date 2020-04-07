@@ -3,13 +3,17 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
+    "postinstall": "patch-package",
     "start": "react-native start",
     "test": "jest",
     "lint": "eslint .",
     "react-native": "react-native",
     "android": "react-native run-android",
     "ios": "react-native run-ios",
-    "windows": "react-native run-windows"
+    "windows": "react-native run-windows",
+    "patch-package": "patch-package",
+    "apply-patch": "patch-package",
+    "update-patch": "patch-package react-native-windows --exclude \"(package.json|build|target|vcxproj)\""
   },
   "dependencies": {
     "react": "16.8.6",
@@ -26,6 +30,7 @@
     "eslint": "6.8.0",
     "jest": "24.9.0",
     "metro-react-native-babel-preset": "0.54.1",
+    "patch-package": "^6.2.2",
     "react-test-renderer": "16.8.6"
   },
   "jest": {

@@ -3,14 +3,17 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "react-native": "react-native",
-    "android": "react-native run-android",
-    "ios": "react-native run-ios",
+    "postinstall": "patch-package",
     "start": "react-native start",
     "test": "jest",
     "lint": "eslint .",
+    "react-native": "react-native",
+    "android": "react-native run-android",
+    "ios": "react-native run-ios",
+    "windows": "react-native run-windows",
     "patch-package": "patch-package",
-    "postinstall": "patch-package"
+    "apply-patch": "patch-package",
+    "update-patch": "patch-package react-native-windows --exclude \"(package.json|build|target|vcxproj)\""
   },
   "dependencies": {
     "react": "16.9.0",
