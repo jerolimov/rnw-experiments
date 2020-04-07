@@ -1,0 +1,298 @@
+diff --git a/node_modules/react-native-windows/Libraries/Components/View/ReactNativeViewAttributes.js b/node_modules/react-native-windows/Libraries/Components/View/ReactNativeViewAttributes.js
+index 4a06023..4ec5346 100644
+--- a/node_modules/react-native-windows/Libraries/Components/View/ReactNativeViewAttributes.js
++++ b/node_modules/react-native-windows/Libraries/Components/View/ReactNativeViewAttributes.js
+@@ -40,8 +40,12 @@ ReactNativeViewAttributes.UIView = {
+   needsOffscreenAlphaCompositing: true,
+   onMouseEnter: true, // [TODO(macOS ISS#2323203)
+   onMouseLeave: true,
++  allowDrag: true,
++  allowDrop: true,
++  draggable: true,
+   onDragEnter: true,
+   onDragLeave: true,
++  onDragOver: true,
+   onDrop: true,
+   draggedTypes: true, // ]TODO(macOS ISS#2323203)
+   style: ReactNativeStyleAttributes,
+diff --git a/node_modules/react-native-windows/ReactUWP/Views/TouchEventHandler.cpp b/node_modules/react-native-windows/ReactUWP/Views/TouchEventHandler.cpp
+index 4ce595d..af65866 100644
+--- a/node_modules/react-native-windows/ReactUWP/Views/TouchEventHandler.cpp
++++ b/node_modules/react-native-windows/ReactUWP/Views/TouchEventHandler.cpp
+@@ -19,6 +19,8 @@
+ #include <winrt/Windows.UI.Xaml.Media.h>
+ #include <winrt/Windows.UI.Xaml.h>
+ 
++#include "Utils/Helpers.h"
++
+ namespace react {
+ namespace uwp {
+ 
+@@ -51,6 +53,10 @@ void TouchEventHandler::AddTouchHandlers(XamlView xamlView) {
+   m_exitedRevoker = uiElement.PointerExited(winrt::auto_revoke, {this, &TouchEventHandler::OnPointerExited});
+   m_movedRevoker.revoke();
+   m_movedRevoker = uiElement.PointerMoved(winrt::auto_revoke, {this, &TouchEventHandler::OnPointerMoved});
++
++  // uiElement.AllowDrop(true);
++  m_dragOverRevoker.revoke();
++  m_dragOverRevoker = uiElement.DragOver(winrt::auto_revoke, {this, &TouchEventHandler::OnDragOver});
+ }
+ 
+ void TouchEventHandler::RemoveTouchHandlers() {
+@@ -104,6 +110,17 @@ void TouchEventHandler::OnPointerCaptureLost(
+ }
+ 
+ void TouchEventHandler::OnPointerExited(const winrt::IInspectable &sender, const winrt::PointerRoutedEventArgs &args) {
++  auto instance = m_wkReactInstance.lock();
++
++  auto sender1 = sender.try_as<winrt::FrameworkElement>();
++  auto source1 = args.OriginalSource().try_as<winrt::FrameworkElement>();
++  auto sourceTag = source1.Tag();
++  auto reactId = getViewId(instance.operator->(), source1);
++
++  auto senderId = getViewId(instance.operator->(), sender1);
++
++  // var enumerator = RootViewHelper.GetReactViewHierarchy(args.OriginalSource()).GetEnumerator();
++
+   UpdatePointersInViews(args, -1, nullptr);
+ }
+ 
+@@ -131,6 +148,49 @@ void TouchEventHandler::OnPointerMoved(const winrt::IInspectable &sender, const
+   }
+ }
+ 
++void TouchEventHandler::OnDragOver(const winrt::IInspectable &sender, const winrt::DragEventArgs &args) {
++  // Short circuit all of this if we are in an error state
++  auto instance = m_wkReactInstance.lock();
++  if (!instance || instance->IsInError())
++    return;
++
++  args.Handled(true);
++  args.AcceptedOperation(winrt::Windows::ApplicationModel::DataTransfer::DataPackageOperation::Copy);
++
++  auto data = args.Data();
++  auto dataView = args.DataView();
++  // co_await dataView.GetTextAsync();
++  // co_await dataView.GetUriAsync();
++
++  //  if (args.OriginalSource().try_as<winrt::UIElement>() == contentControl.as<winrt::UIElement>()) {
++  //  auto tag = m_tag;
++  //  DispatchEvent("topFocus", std::move(folly::dynamic::object("target", tag)));
++  //}
++
++  auto sender1 = sender.try_as<winrt::FrameworkElement>();
++  auto source1 = args.OriginalSource().try_as<winrt::FrameworkElement>();
++  auto sourceTag = source1.Tag();
++  auto parent1 = winrt::VisualTreeHelper::GetParent(sender1).try_as<winrt::FrameworkElement>();
++  auto parentTag = parent1.Tag();
++  auto uiElement = args.OriginalSource().try_as<winrt::UIElement>();
++
++  auto reactId = getViewId(instance.operator->(), source1);
++  auto reactId2 = getViewId(instance.operator->(), parent1);
++
++  // Only if the view has a Tag can we process this
++  int64_t tag;
++  winrt::FrameworkElement sourceElement(nullptr);
++  if (!TagFromOriginalSource(args, &tag, &sourceElement))
++    return;
++
++  instance->DispatchEvent(tag, "topDragOver", GetJson(tag));
++}
++
++folly::dynamic TouchEventHandler::GetJson(int64_t target) {
++  folly::dynamic json = folly::dynamic::object()("target", target);
++  return json;
++}
++
+ void TouchEventHandler::OnPointerConcluded(TouchEventType eventType, const winrt::PointerRoutedEventArgs &args) {
+   // Short circuit all of this if we are in an error state
+   auto instance = m_wkReactInstance.lock();
+@@ -377,7 +437,7 @@ const char *TouchEventHandler::GetTouchEventTypeName(TouchEventType eventType) n
+ }
+ 
+ bool TouchEventHandler::TagFromOriginalSource(
+-    const winrt::PointerRoutedEventArgs &args,
++    const winrt::RoutedEventArgs &args,
+     int64_t *pTag,
+     winrt::FrameworkElement *pSourceElement) {
+   assert(pTag != nullptr);
+@@ -391,9 +451,15 @@ bool TouchEventHandler::TagFromOriginalSource(
+     return false;
+   } else {
+     auto tag = sourceElement.Tag();
++    if (tag != nullptr) {
++      *pTag = tag.as<winrt::IPropertyValue>().GetInt64();
++    }
+     while (tag == nullptr && sourceElement && winrt::VisualTreeHelper::GetParent(sourceElement)) {
+       sourceElement = winrt::VisualTreeHelper::GetParent(sourceElement).try_as<winrt::FrameworkElement>();
+       tag = sourceElement.Tag();
++      if (tag != nullptr) {
++        *pTag = tag.as<winrt::IPropertyValue>().GetInt64();
++      }
+     }
+ 
+     if (tag == nullptr) {
+diff --git a/node_modules/react-native-windows/ReactUWP/Views/TouchEventHandler.h b/node_modules/react-native-windows/ReactUWP/Views/TouchEventHandler.h
+index 3486321..1297ada 100644
+--- a/node_modules/react-native-windows/ReactUWP/Views/TouchEventHandler.h
++++ b/node_modules/react-native-windows/ReactUWP/Views/TouchEventHandler.h
+@@ -38,6 +38,9 @@ class TouchEventHandler {
+   void OnPointerCaptureLost(const winrt::IInspectable &, const winrt::PointerRoutedEventArgs &args);
+   void OnPointerExited(const winrt::IInspectable &, const winrt::PointerRoutedEventArgs &args);
+   void OnPointerMoved(const winrt::IInspectable &, const winrt::PointerRoutedEventArgs &args);
++
++  void OnDragOver(const winrt::IInspectable &, const winrt::DragEventArgs &args);
++
+   winrt::event_revoker<winrt::IUIElement> m_pressedRevoker;
+   winrt::event_revoker<winrt::IUIElement> m_releasedRevoker;
+   winrt::event_revoker<winrt::IUIElement> m_canceledRevoker;
+@@ -45,6 +48,8 @@ class TouchEventHandler {
+   winrt::event_revoker<winrt::IUIElement> m_exitedRevoker;
+   winrt::event_revoker<winrt::IUIElement> m_movedRevoker;
+ 
++  winrt::event_revoker<winrt::IUIElement> m_dragOverRevoker;
++
+   struct ReactPointer {
+     int64_t target = 0;
+     int64_t identifier = 0;
+@@ -82,13 +87,13 @@ class TouchEventHandler {
+   const char *GetTouchEventTypeName(TouchEventType eventType) noexcept;
+ 
+   std::optional<size_t> IndexOfPointerWithId(uint32_t pointerId);
++  folly::dynamic GetJson(int64_t target);
+   folly::dynamic GetPointerJson(const ReactPointer &pointer, int64_t target);
+   std::vector<ReactPointer> m_pointers;
+   std::unordered_map<uint32_t /*pointerId*/, std::set<int64_t> /*tags*/> m_pointersInViews;
+   int64_t m_touchId = 0;
+ 
+-  bool TagFromOriginalSource(
+-      const winrt::PointerRoutedEventArgs &args,
++  bool TagFromOriginalSource(const winrt::RoutedEventArgs &args,
+       int64_t *pTag,
+       winrt::FrameworkElement *pSourceElement);
+   std::set<int64_t> GetTagsAtPoint(const winrt::PointerRoutedEventArgs &e);
+diff --git a/node_modules/react-native-windows/ReactUWP/Views/ViewManagerBase.cpp b/node_modules/react-native-windows/ReactUWP/Views/ViewManagerBase.cpp
+index 89ce5cc..66e1ee3 100644
+--- a/node_modules/react-native-windows/ReactUWP/Views/ViewManagerBase.cpp
++++ b/node_modules/react-native-windows/ReactUWP/Views/ViewManagerBase.cpp
+@@ -161,10 +161,19 @@ dynamic ViewManagerBase::GetExportedCustomBubblingEventTypeConstants() const {
+ 
+ dynamic ViewManagerBase::GetExportedCustomDirectEventTypeConstants() const {
+   folly::dynamic eventTypes = folly::dynamic::object();
+-  eventTypes.update(folly::dynamic::object("topLayout", folly::dynamic::object("registrationName", "onLayout"))(
+-      "topMouseEnter", folly::dynamic::object("registrationName", "onMouseEnter"))(
+-      "topMouseLeave", folly::dynamic::object("registrationName", "onMouseLeave"))(
+-      "topAccessibilityAction", folly::dynamic::object("registrationName", "onAccessibilityAction"))
++  eventTypes.update(folly::dynamic::object("topLayout", folly::dynamic::object("registrationName", "onLayout"))
++      ("topMouseEnter", folly::dynamic::object("registrationName", "onMouseEnter"))
++      ("topMouseLeave", folly::dynamic::object("registrationName", "onMouseLeave"))
++      
++      ("topDragStart", folly::dynamic::object("registrationName", "onDragStart"))
++      ("topDrag", folly::dynamic::object("registrationName", "onDrag"))
++      ("topDragEnd", folly::dynamic::object("registrationName", "onDragEnd"))
++      ("topDragEnter", folly::dynamic::object("registrationName", "onDragEnter"))
++      ("topDragOver", folly::dynamic::object("registrationName", "onDragOver"))
++      ("topDragLeave", folly::dynamic::object("registrationName", "onDragLeave"))
++      ("topDrop", folly::dynamic::object("registrationName", "onDrop"))
++
++      ("topAccessibilityAction", folly::dynamic::object("registrationName", "onAccessibilityAction"))
+                     //    ("topMouseMove",
+                     //    folly::dynamic::object("registrationName",
+                     //    "onMouseMove"))
+diff --git a/node_modules/react-native-windows/ReactUWP/Views/ViewViewManager.cpp b/node_modules/react-native-windows/ReactUWP/Views/ViewViewManager.cpp
+index 3d5ff79..757ebc4 100644
+--- a/node_modules/react-native-windows/ReactUWP/Views/ViewViewManager.cpp
++++ b/node_modules/react-native-windows/ReactUWP/Views/ViewViewManager.cpp
+@@ -321,11 +321,30 @@ XamlView ViewViewManager::CreateViewCore(int64_t tag) {
+ folly::dynamic ViewViewManager::GetNativeProps() const {
+   auto props = Super::GetNativeProps();
+ 
+-  props.update(folly::dynamic::object("pointerEvents", "string")("onClick", "function")("onMouseEnter", "function")(
+-      "onMouseLeave", "function")
+-               //("onMouseMove", "function")
+-               ("acceptsKeyboardFocus", "boolean")("enableFocusRing", "boolean")("tabIndex", "number"));
+-
++  props.update(
++    folly::dynamic::object
++      ("pointerEvents", "string")
++      ("onClick", "function")
++      ("onMouseEnter", "function")
++      ("onMouseLeave", "function")
++
++("allowDrag", "boolean")
++("allowDrop", "boolean")
++("draggable", "boolean")
++
++      ("onDragStart", "function")
++      ("onDrag", "function")
++      ("onDragEnd", "function")
++      ("onDragEnter", "function")
++      ("onDragOver", "function")
++      ("onDragLeave", "function")
++      ("onDrop", "function")
++
++      //("onMouseMove", "function")
++      ("acceptsKeyboardFocus", "boolean")
++      ("enableFocusRing", "boolean")
++      ("tabIndex", "number")
++  );
+   return props;
+ }
+ 
+@@ -341,6 +360,12 @@ void ViewViewManager::UpdateProperties(ShadowNodeBase *nodeToUpdate, const folly
+       const std::string &propertyName = pair.first.getString();
+       const folly::dynamic &propertyValue = pair.second;
+ 
++      if (propertyName == "allowDrop") {
++        if (propertyValue.isBool())
++          pPanel.AllowDrop(true);
++          // pPanel.AllowDrop(propertyValue.asBool());
++      }
++
+       if (TryUpdateBackgroundBrush(pPanel, propertyName, propertyValue)) {
+         continue;
+       } else if (TryUpdateBorderProperties(nodeToUpdate, pPanel, propertyName, propertyValue)) {
+diff --git a/node_modules/react-native-windows/include/ReactUWP/Utils/PropertyUtils.h b/node_modules/react-native-windows/include/ReactUWP/Utils/PropertyUtils.h
+index 610ebea..1bfb611 100644
+--- a/node_modules/react-native-windows/include/ReactUWP/Utils/PropertyUtils.h
++++ b/node_modules/react-native-windows/include/ReactUWP/Utils/PropertyUtils.h
+@@ -496,6 +496,20 @@ TryUpdateMouseEvents(ShadowNodeBase *node, const std::string &propertyName, cons
+     node->m_onMouseLeave = !propertyValue.isNull() && propertyValue.asBool();
+   else if (propertyName == "onMouseMove")
+     node->m_onMouseMove = !propertyValue.isNull() && propertyValue.asBool();
++  else if (propertyName == "onDragStart")
++    node->m_onDragStart = !propertyValue.isNull() && propertyValue.asBool();
++  else if (propertyName == "onDrag")
++    node->m_onDrag = !propertyValue.isNull() && propertyValue.asBool();
++  else if (propertyName == "onDragEnd")
++    node->m_onDragEnd = !propertyValue.isNull() && propertyValue.asBool();
++  else if (propertyName == "onDragEnter")
++    node->m_onDragEnter = !propertyValue.isNull() && propertyValue.asBool();
++  else if (propertyName == "onDragOver")
++    node->m_onDragOver = !propertyValue.isNull() && propertyValue.asBool();
++  else if (propertyName == "onDragLeave")
++    node->m_onDragLeave = !propertyValue.isNull() && propertyValue.asBool();
++  else if (propertyName == "onDrop")
++    node->m_onDrop = !propertyValue.isNull() && propertyValue.asBool();
+   else
+     return false;
+ 
+diff --git a/node_modules/react-native-windows/include/ReactUWP/Views/ShadowNodeBase.h b/node_modules/react-native-windows/include/ReactUWP/Views/ShadowNodeBase.h
+index 64cbe4c..a47aa39 100644
+--- a/node_modules/react-native-windows/include/ReactUWP/Views/ShadowNodeBase.h
++++ b/node_modules/react-native-windows/include/ReactUWP/Views/ShadowNodeBase.h
+@@ -111,6 +111,14 @@ struct REACTWINDOWS_EXPORT ShadowNodeBase : public facebook::react::ShadowNode {
+   bool m_onMouseLeave = false;
+   bool m_onMouseMove = false;
+ 
++  bool m_onDragStart = false;
++  bool m_onDrag = false;
++  bool m_onDragEnd = false;
++  bool m_onDragEnter = false;
++  bool m_onDragOver = false;
++  bool m_onDragLeave = false;
++  bool m_onDrop = false;
++
+   // Support Keyboard
+  public:
+   void UpdateHandledKeyboardEvents(std::string const &propertyName, folly::dynamic const &value);
