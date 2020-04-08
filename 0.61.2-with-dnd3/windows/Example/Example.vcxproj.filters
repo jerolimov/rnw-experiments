@@ -11,11 +11,15 @@
     <ClCompile Include="App.cpp" />
     <ClCompile Include="$(GeneratedFilesDir)module.g.cpp" />
     <ClCompile Include="ReactPackageProvider.cpp" />
+    <ClCompile Include="DragableViewManager.cpp" />
+    <ClCompile Include="DropableViewManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
     <ClInclude Include="App.h" />
     <ClInclude Include="ReactPackageProvider.h" />
+    <ClInclude Include="DragableViewManager.h" />
+    <ClInclude Include="DropableViewManager.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\Wide310x150Logo.scale-200.png">

@@ -5,7 +5,11 @@ import {
   View,
   Text,
   StatusBar,
+  requireNativeComponent,
 } from 'react-native';
+
+const Dragable = requireNativeComponent('Dragable');
+const Dropable = requireNativeComponent('Dropable');
 
 export default function App() {
   return (
@@ -20,7 +24,7 @@ export default function App() {
             </View>
           )}
 
-          <View
+          <Dragable
             // onMouseEnter={() => console.warn('onMouseEnter')}
             // onMouseMove={() => console.warn('onMouseMove')}
             // onMouseLeave={() => console.warn('onMouseLeave')}
@@ -33,9 +37,9 @@ export default function App() {
             style={{ padding: 30, margin: 30, borderWidth: 2, borderColor: 'red', backgroundColor: '#e0e0e0' }}
           >
             <Text>Drag me #1</Text>
-          </View>
+          </Dragable>
 
-          <View
+          <Dropable
             // onMouseEnter={() => console.warn('onMouseEnter')}
             // onMouseMove={() => console.warn('onMouseMove')}
             // onMouseLeave={() => console.warn('onMouseLeave')}
@@ -49,7 +53,7 @@ export default function App() {
             style={{ padding: 30, margin: 30, borderWidth: 2, borderColor: 'red', backgroundColor: '#e0e0e0' }}
           >
             <Text>Drop here #1</Text>
-          </View>
+          </Dropable>
 
         </ScrollView>
       </SafeAreaView>

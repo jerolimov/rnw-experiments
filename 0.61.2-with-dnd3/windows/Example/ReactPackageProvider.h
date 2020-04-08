@@ -2,8 +2,6 @@
 
 #include "winrt/Microsoft.ReactNative.h"
 
-
-
 using namespace winrt::Microsoft::ReactNative;
 
 namespace winrt::Example::implementation
