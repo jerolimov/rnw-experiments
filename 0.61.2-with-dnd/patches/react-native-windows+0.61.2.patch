@@ -1,5 +1,60 @@
+diff --git a/node_modules/react-native-windows/Libraries/Components/View/ReactNativeViewViewConfig.windows.js b/node_modules/react-native-windows/Libraries/Components/View/ReactNativeViewViewConfig.windows.js
+index 86916b0..f2d627a 100644
+--- a/node_modules/react-native-windows/Libraries/Components/View/ReactNativeViewViewConfig.windows.js
++++ b/node_modules/react-native-windows/Libraries/Components/View/ReactNativeViewViewConfig.windows.js
+@@ -130,6 +130,30 @@ const ReactNativeViewConfig = {
+     topMouseLeave: {
+       registrationName: 'onMouseLeave',
+     },
++
++    // Drag and drop
++    topDragStart: {
++      registrationName: 'onDragStart',
++    },
++    topDrag: {
++      registrationName: 'onDrag',
++    },
++    topDragLeave: {
++      registrationName: 'onDragLeave',
++    },
++
++    topDragEnter: {
++      registrationName: 'onDragEnter',
++    },
++    topDragOver: {
++      registrationName: 'onDragOver',
++    },
++    topDragEnd: {
++      registrationName: 'onDragEnd',
++    },
++    topDrop: {
++      registrationName: 'onDrop',
++    },
+   },
+   validAttributes: {
+     ...ReactNativeViewViewConfigAndroid.validAttributes,
+@@ -368,6 +392,19 @@ const ReactNativeViewConfig = {
+     enableFocusRing: true,
+     onClick: true,
+     onMouseLeave: true,
++
++    // Drag and Drop support
++    allowDrop: true,
++
++    onDragStart: true,
++    onDrag: true,
++    onDragLeave: true,
++
++    onDragEnter: true,
++    onDragOver: true,
++    onDragEnd: true,
++    onDrop: true,
++
+     acceptsKeyboardFocus: true,
+     tabIndex: true,
+     // Windows]
 diff --git a/node_modules/react-native-windows/Libraries/Components/View/ViewPropTypes.windows.js b/node_modules/react-native-windows/Libraries/Components/View/ViewPropTypes.windows.js
-index 9518e9c..1eb0df3 100644
+index 9518e9c..4c73fd5 100644
 --- a/node_modules/react-native-windows/Libraries/Components/View/ViewPropTypes.windows.js
 +++ b/node_modules/react-native-windows/Libraries/Components/View/ViewPropTypes.windows.js
 @@ -423,6 +423,19 @@ type WindowsViewProps = $ReadOnly<{|
@@ -10,20 +65,20 @@ index 9518e9c..1eb0df3 100644
 +  /**
 +   * Drag and drop support
 +   */
-+  allowDrag?: ?boolean,
-+  allowDrop?: ?boolean,
-+  draggable?: ?boolean,
++  // allowDrag?: ?boolean,
++  // allowDrop?: ?boolean,
++  // draggable?: ?boolean,
 +
-+  onDragStart?: ?(event: SyntheticEvent<{}>) => mixed,
-+  onDrag?: ?(event: SyntheticEvent<{}>) => mixed,
-+  onDragEnd?: ?(event: SyntheticEvent<{}>) => mixed,
-+  onDrop?: ?(event: SyntheticEvent<{}>) => mixed,
++  // onDragStart?: ?(event: SyntheticEvent<{}>) => mixed,
++  // onDrag?: ?(event: SyntheticEvent<{}>) => mixed,
++  // onDragEnd?: ?(event: SyntheticEvent<{}>) => mixed,
++  // onDrop?: ?(event: SyntheticEvent<{}>) => mixed,
 +
  |}>;
  // Windows]
  
 diff --git a/node_modules/react-native-windows/ReactUWP/Views/TouchEventHandler.cpp b/node_modules/react-native-windows/ReactUWP/Views/TouchEventHandler.cpp
-index 5e7a58e..d301147 100644
+index 5e7a58e..69fe58c 100644
 --- a/node_modules/react-native-windows/ReactUWP/Views/TouchEventHandler.cpp
 +++ b/node_modules/react-native-windows/ReactUWP/Views/TouchEventHandler.cpp
 @@ -19,6 +19,8 @@
@@ -40,15 +95,18 @@ index 5e7a58e..d301147 100644
    m_movedRevoker.revoke();
    m_movedRevoker = uiElement.PointerMoved(winrt::auto_revoke, {this, &TouchEventHandler::OnPointerMoved});
 +
-+  uiElement.AllowDrop(true);
++  // uiElement.AllowDrop(true);
 +  m_dragOverRevoker.revoke();
 +  m_dragOverRevoker = uiElement.DragOver(winrt::auto_revoke, {this, &TouchEventHandler::OnDragOver});
  }
  
  void TouchEventHandler::RemoveTouchHandlers() {
-@@ -108,6 +114,18 @@ void TouchEventHandler::OnPointerCaptureLost(
+@@ -106,8 +112,20 @@ void TouchEventHandler::OnPointerCaptureLost(
+ }
+ 
  void TouchEventHandler::OnPointerExited(
-     const winrt::IInspectable & /*sender*/,
+-    const winrt::IInspectable & /*sender*/,
++    const winrt::IInspectable & sender,
      const winrt::PointerRoutedEventArgs &args) {
 +
 +  auto instance = m_wkReactInstance.lock();
@@ -180,10 +238,10 @@ index 3486321..5a6045d 100644
        winrt::FrameworkElement *pSourceElement);
    std::set<int64_t> GetTagsAtPoint(const winrt::PointerRoutedEventArgs &e);
 diff --git a/node_modules/react-native-windows/ReactUWP/Views/ViewManagerBase.cpp b/node_modules/react-native-windows/ReactUWP/Views/ViewManagerBase.cpp
-index f41857c..f622c12 100644
+index f41857c..14a2d09 100644
 --- a/node_modules/react-native-windows/ReactUWP/Views/ViewManagerBase.cpp
 +++ b/node_modules/react-native-windows/ReactUWP/Views/ViewManagerBase.cpp
-@@ -161,13 +161,21 @@ dynamic ViewManagerBase::GetExportedCustomBubblingEventTypeConstants() const {
+@@ -161,13 +161,24 @@ dynamic ViewManagerBase::GetExportedCustomBubblingEventTypeConstants() const {
  
  dynamic ViewManagerBase::GetExportedCustomDirectEventTypeConstants() const {
    folly::dynamic eventTypes = folly::dynamic::object();
@@ -201,9 +259,12 @@ index f41857c..f622c12 100644
 +    ("topAccessibilityAction", folly::dynamic::object("registrationName", "onAccessibilityAction"))
 +    // ("topMouseMove", folly::dynamic::object("registrationName", "onMouseMove"))
 +
++    // Drag support
 +    ("topDragStart", folly::dynamic::object("registrationName", "onDragStart"))
 +    ("topDrag", folly::dynamic::object("registrationName", "onDrag"))
 +    ("topDragEnd", folly::dynamic::object("registrationName", "onDragEnd"))
++
++    // Drop support
 +    ("topDragEnter", folly::dynamic::object("registrationName", "onDragEnter"))
 +    ("topDragOver", folly::dynamic::object("registrationName", "onDragOver"))
 +    ("topDragLeave", folly::dynamic::object("registrationName", "onDragLeave"))
@@ -213,10 +274,10 @@ index f41857c..f622c12 100644
    return eventTypes;
  }
 diff --git a/node_modules/react-native-windows/ReactUWP/Views/ViewViewManager.cpp b/node_modules/react-native-windows/ReactUWP/Views/ViewViewManager.cpp
-index 9f0d990..9baf314 100644
+index 9f0d990..d5290fb 100644
 --- a/node_modules/react-native-windows/ReactUWP/Views/ViewViewManager.cpp
 +++ b/node_modules/react-native-windows/ReactUWP/Views/ViewViewManager.cpp
-@@ -324,10 +324,29 @@ XamlView ViewViewManager::CreateViewCore(int64_t /*tag*/) {
+@@ -324,10 +324,31 @@ XamlView ViewViewManager::CreateViewCore(int64_t /*tag*/) {
  folly::dynamic ViewViewManager::GetNativeProps() const {
    auto props = Super::GetNativeProps();
  
@@ -231,13 +292,15 @@ index 9f0d990..9baf314 100644
 +      ("onMouseLeave", "function")
 +      //("onMouseMove", "function")
 +
-+      ("allowDrag", "boolean")
++      // Drag and drop support
++      // ("allowDrag", "boolean")
 +      ("allowDrop", "boolean")
-+      ("draggable", "boolean")
++      // ("draggable", "boolean")
 +
 +      ("onDragStart", "function")
 +      ("onDrag", "function")
 +      ("onDragEnd", "function")
++
 +      ("onDragEnter", "function")
 +      ("onDragOver", "function")
 +      ("onDragLeave", "function")
@@ -250,14 +313,16 @@ index 9f0d990..9baf314 100644
  
    return props;
  }
-@@ -344,6 +363,12 @@ void ViewViewManager::UpdateProperties(ShadowNodeBase *nodeToUpdate, const folly
+@@ -344,6 +365,14 @@ void ViewViewManager::UpdateProperties(ShadowNodeBase *nodeToUpdate, const folly
        const std::string &propertyName = pair.first.getString();
        const folly::dynamic &propertyValue = pair.second;
  
 +      if (propertyName == "allowDrop") {
-+        if (propertyValue.isBool())
-+          pPanel.AllowDrop(true);
-+          // pPanel.AllowDrop(propertyValue.asBool());
++        if (propertyValue.isBool()) {
++          // pPanel.AllowDrop(true);
++          pPanel.AllowDrop(propertyValue.asBool());
++        }
++        continue;
 +      }
 +
        if (TryUpdateBackgroundBrush(pPanel, propertyName, propertyValue)) {
