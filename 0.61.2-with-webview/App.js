@@ -7,6 +7,7 @@ import {
 } from 'react-native';
 
 import { WebView } from 'react-native-webview';
+import MarkdownView from 'react-native-showdown';
 
 export default function App() {
   return (
@@ -24,6 +25,11 @@ export default function App() {
 
         <WebView
           source={{ html: 'hello world'}}
+        />
+
+        <MarkdownView
+          markdown={'`MarkdownView` (which renders into an webview) works also. :+1:'}
+          options={{ emoji: true }}
         />
 
         <Text>Below the webview</Text>
