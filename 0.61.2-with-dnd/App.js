@@ -21,23 +21,24 @@ export default function App() {
           )}
 
           <View
-            onMouseEnter={() => console.warn('onMouseEnter')}
-            onMouseMove={() => console.warn('onMouseMove')}
-            onMouseLeave={() => console.warn('onMouseLeave')}
+            // onMouseEnter={() => console.warn('onMouseEnter')}
+            // onMouseMove={() => console.warn('onMouseMove')}
+            // onMouseLeave={() => console.warn('onMouseLeave')}
 
+            allowDrag
             onDragStart={() => console.warn('onDragStart')}
             onDrag={() => console.warn('onDrag')}
             onDragEnd={() => console.warn('onDragEnd')}
 
-            style={{ padding: 30, margin: 30, borderWidth: 2, borderColor: 'red' }}
+            style={{ padding: 30, margin: 30, borderWidth: 2, borderColor: 'red', backgroundColor: '#e0e0e0' }}
           >
             <Text>Drag me #1</Text>
           </View>
 
           <View
-            onMouseEnter={() => console.warn('onMouseEnter')}
-            onMouseMove={() => console.warn('onMouseMove')}
-            onMouseLeave={() => console.warn('onMouseLeave')}
+            // onMouseEnter={() => console.warn('onMouseEnter')}
+            // onMouseMove={() => console.warn('onMouseMove')}
+            // onMouseLeave={() => console.warn('onMouseLeave')}
 
             allowDrop
             onDragEnter={() => console.warn('onDragEnter')}
@@ -45,7 +46,7 @@ export default function App() {
             onDragLeave={() => console.warn('onDragLeave')}
             onDrop={() => console.warn('onDrop')}
 
-            style={{ padding: 30, margin: 30, borderWidth: 2, borderColor: 'red' }}
+            style={{ padding: 30, margin: 30, borderWidth: 2, borderColor: 'red', backgroundColor: '#e0e0e0' }}
           >
             <Text>Drop here #1</Text>
           </View>

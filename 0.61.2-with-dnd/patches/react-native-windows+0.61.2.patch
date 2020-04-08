@@ -1,5 +1,5 @@
 diff --git a/node_modules/react-native-windows/Libraries/Components/View/ReactNativeViewViewConfig.windows.js b/node_modules/react-native-windows/Libraries/Components/View/ReactNativeViewViewConfig.windows.js
-index 86916b0..f2d627a 100644
+index 86916b0..4468608 100644
 --- a/node_modules/react-native-windows/Libraries/Components/View/ReactNativeViewViewConfig.windows.js
 +++ b/node_modules/react-native-windows/Libraries/Components/View/ReactNativeViewViewConfig.windows.js
 @@ -130,6 +130,30 @@ const ReactNativeViewConfig = {
@@ -33,12 +33,13 @@ index 86916b0..f2d627a 100644
    },
    validAttributes: {
      ...ReactNativeViewViewConfigAndroid.validAttributes,
-@@ -368,6 +392,19 @@ const ReactNativeViewConfig = {
+@@ -368,6 +392,20 @@ const ReactNativeViewConfig = {
      enableFocusRing: true,
      onClick: true,
      onMouseLeave: true,
 +
 +    // Drag and Drop support
++    allowDrag: true,
 +    allowDrop: true,
 +
 +    onDragStart: true,
@@ -78,7 +79,7 @@ index 9518e9c..4c73fd5 100644
  // Windows]
  
 diff --git a/node_modules/react-native-windows/ReactUWP/Views/TouchEventHandler.cpp b/node_modules/react-native-windows/ReactUWP/Views/TouchEventHandler.cpp
-index 5e7a58e..69fe58c 100644
+index 5e7a58e..9c963db 100644
 --- a/node_modules/react-native-windows/ReactUWP/Views/TouchEventHandler.cpp
 +++ b/node_modules/react-native-windows/ReactUWP/Views/TouchEventHandler.cpp
 @@ -19,6 +19,8 @@
@@ -90,18 +91,22 @@ index 5e7a58e..69fe58c 100644
  namespace react {
  namespace uwp {
  
-@@ -51,6 +53,10 @@ void TouchEventHandler::AddTouchHandlers(XamlView xamlView) {
+@@ -51,6 +53,14 @@ void TouchEventHandler::AddTouchHandlers(XamlView xamlView) {
    m_exitedRevoker = uiElement.PointerExited(winrt::auto_revoke, {this, &TouchEventHandler::OnPointerExited});
    m_movedRevoker.revoke();
    m_movedRevoker = uiElement.PointerMoved(winrt::auto_revoke, {this, &TouchEventHandler::OnPointerMoved});
 +
 +  // uiElement.AllowDrop(true);
++  m_dragEnterRevoker.revoke();
++  m_dragEnterRevoker = uiElement.DragEnter(winrt::auto_revoke, {this, &TouchEventHandler::OnDragOver});
 +  m_dragOverRevoker.revoke();
 +  m_dragOverRevoker = uiElement.DragOver(winrt::auto_revoke, {this, &TouchEventHandler::OnDragOver});
++  m_dragLeaveRevoker.revoke();
++  m_dragLeaveRevoker = uiElement.DragLeave(winrt::auto_revoke, {this, &TouchEventHandler::OnDragOver});
  }
  
  void TouchEventHandler::RemoveTouchHandlers() {
-@@ -106,8 +112,20 @@ void TouchEventHandler::OnPointerCaptureLost(
+@@ -106,8 +116,20 @@ void TouchEventHandler::OnPointerCaptureLost(
  }
  
  void TouchEventHandler::OnPointerExited(
@@ -123,7 +128,7 @@ index 5e7a58e..69fe58c 100644
    UpdatePointersInViews(args, -1, nullptr);
  }
  
-@@ -164,6 +182,49 @@ void TouchEventHandler::OnPointerConcluded(TouchEventType eventType, const winrt
+@@ -164,6 +186,49 @@ void TouchEventHandler::OnPointerConcluded(TouchEventType eventType, const winrt
    m_xamlView.as<winrt::FrameworkElement>().ReleasePointerCapture(args.Pointer());
  }
  
@@ -173,7 +178,7 @@ index 5e7a58e..69fe58c 100644
  size_t TouchEventHandler::AddReactPointer(
      const winrt::PointerRoutedEventArgs &args,
      int64_t tag,
-@@ -383,7 +444,7 @@ const char *TouchEventHandler::GetTouchEventTypeName(TouchEventType eventType) n
+@@ -383,7 +448,7 @@ const char *TouchEventHandler::GetTouchEventTypeName(TouchEventType eventType) n
  }
  
  bool TouchEventHandler::TagFromOriginalSource(
@@ -182,7 +187,7 @@ index 5e7a58e..69fe58c 100644
      int64_t *pTag,
      winrt::FrameworkElement *pSourceElement) {
    assert(pTag != nullptr);
-@@ -397,9 +458,15 @@ bool TouchEventHandler::TagFromOriginalSource(
+@@ -397,9 +462,15 @@ bool TouchEventHandler::TagFromOriginalSource(
      return false;
    } else {
      auto tag = sourceElement.Tag();
@@ -199,7 +204,7 @@ index 5e7a58e..69fe58c 100644
  
      if (tag == nullptr) {
 diff --git a/node_modules/react-native-windows/ReactUWP/Views/TouchEventHandler.h b/node_modules/react-native-windows/ReactUWP/Views/TouchEventHandler.h
-index 3486321..5a6045d 100644
+index 3486321..582d1a1 100644
 --- a/node_modules/react-native-windows/ReactUWP/Views/TouchEventHandler.h
 +++ b/node_modules/react-native-windows/ReactUWP/Views/TouchEventHandler.h
 @@ -38,6 +38,9 @@ class TouchEventHandler {
@@ -212,16 +217,18 @@ index 3486321..5a6045d 100644
    winrt::event_revoker<winrt::IUIElement> m_pressedRevoker;
    winrt::event_revoker<winrt::IUIElement> m_releasedRevoker;
    winrt::event_revoker<winrt::IUIElement> m_canceledRevoker;
-@@ -45,6 +48,8 @@ class TouchEventHandler {
+@@ -45,6 +48,10 @@ class TouchEventHandler {
    winrt::event_revoker<winrt::IUIElement> m_exitedRevoker;
    winrt::event_revoker<winrt::IUIElement> m_movedRevoker;
  
++  winrt::event_revoker<winrt::IUIElement> m_dragEnterRevoker;
 +  winrt::event_revoker<winrt::IUIElement> m_dragOverRevoker;
++  winrt::event_revoker<winrt::IUIElement> m_dragLeaveRevoker;
 +
    struct ReactPointer {
      int64_t target = 0;
      int64_t identifier = 0;
-@@ -82,13 +87,14 @@ class TouchEventHandler {
+@@ -82,13 +89,14 @@ class TouchEventHandler {
    const char *GetTouchEventTypeName(TouchEventType eventType) noexcept;
  
    std::optional<size_t> IndexOfPointerWithId(uint32_t pointerId);
@@ -274,7 +281,7 @@ index f41857c..14a2d09 100644
    return eventTypes;
  }
 diff --git a/node_modules/react-native-windows/ReactUWP/Views/ViewViewManager.cpp b/node_modules/react-native-windows/ReactUWP/Views/ViewViewManager.cpp
-index 9f0d990..d5290fb 100644
+index 9f0d990..0fc7916 100644
 --- a/node_modules/react-native-windows/ReactUWP/Views/ViewViewManager.cpp
 +++ b/node_modules/react-native-windows/ReactUWP/Views/ViewViewManager.cpp
 @@ -324,10 +324,31 @@ XamlView ViewViewManager::CreateViewCore(int64_t /*tag*/) {
@@ -293,7 +300,7 @@ index 9f0d990..d5290fb 100644
 +      //("onMouseMove", "function")
 +
 +      // Drag and drop support
-+      // ("allowDrag", "boolean")
++      ("allowDrag", "boolean")
 +      ("allowDrop", "boolean")
 +      // ("draggable", "boolean")
 +
@@ -313,13 +320,17 @@ index 9f0d990..d5290fb 100644
  
    return props;
  }
-@@ -344,6 +365,14 @@ void ViewViewManager::UpdateProperties(ShadowNodeBase *nodeToUpdate, const folly
+@@ -344,6 +365,18 @@ void ViewViewManager::UpdateProperties(ShadowNodeBase *nodeToUpdate, const folly
        const std::string &propertyName = pair.first.getString();
        const folly::dynamic &propertyValue = pair.second;
  
-+      if (propertyName == "allowDrop") {
++      if (propertyName == "allowDrag") {
 +        if (propertyValue.isBool()) {
-+          // pPanel.AllowDrop(true);
++          pPanel.CanDrag(propertyValue.asBool());
++        }
++        continue;
++      } else if (propertyName == "allowDrop") {
++        if (propertyValue.isBool()) {
 +          pPanel.AllowDrop(propertyValue.asBool());
 +        }
 +        continue;
