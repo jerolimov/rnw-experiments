@@ -63,6 +63,30 @@ jobs:
       run: npm run react-native -- run-windows --info
       working-directory: 0.61.2-with-dnd
 
+  build-0_61_2-with-dnd2:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v1
+    - name: npm install
+      run: npm install
+      working-directory: 0.61.2-with-dnd2
+    - name: react-native run-windows --info
+      run: npm run react-native -- run-windows --info
+      working-directory: 0.61.2-with-dnd2
+
+  build-0_61_2-with-dnd3:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v1
+    - name: npm install
+      run: npm install
+      working-directory: 0.61.2-with-dnd3
+    - name: react-native run-windows --info
+      run: npm run react-native -- run-windows --info
+      working-directory: 0.61.2-with-dnd3
+
   build-0_61_2-with-webview:
     runs-on: windows-latest
     steps:
