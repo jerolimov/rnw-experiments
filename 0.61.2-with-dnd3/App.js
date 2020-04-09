@@ -49,6 +49,7 @@ export default function App() {
             onDragOver={() => console.warn('onDragOver')}
             onDragLeave={() => console.warn('onDragLeave')}
             onDrop={() => console.warn('onDrop')}
+            onDropCompleted={() => console.warn('onDropCompleted')}
 
             style={{ padding: 30, margin: 30, borderWidth: 2, borderColor: 'red', backgroundColor: '#e0e0e0' }}
           >

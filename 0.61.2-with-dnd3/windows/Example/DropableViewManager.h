@@ -24,7 +24,8 @@ namespace winrt::Example::implementation {
         DropableViewManager,
         winrt::Microsoft::ReactNative::IViewManager,
         winrt::Microsoft::ReactNative::IViewManagerWithReactContext,
-        winrt::Microsoft::ReactNative::IViewManagerWithChildren> {
+        winrt::Microsoft::ReactNative::IViewManagerWithChildren,
+        winrt::Microsoft::ReactNative::IViewManagerWithExportedEventTypeConstants> {
     public:
         DropableViewManager() = default;
 
@@ -58,6 +59,12 @@ namespace winrt::Example::implementation {
             winrt::Windows::UI::Xaml::UIElement const& newChild) noexcept;
 
         //
+        // IViewManagerWithExportedEventTypeConstants
+        //
+        winrt::Microsoft::ReactNative::ConstantProviderDelegate ExportedCustomBubblingEventTypeConstants() noexcept;
+        winrt::Microsoft::ReactNative::ConstantProviderDelegate ExportedCustomDirectEventTypeConstants() noexcept;
+
+        //
         // Drag and Drop callbacks
         //
         void OnDragEnter(
@@ -69,7 +76,12 @@ namespace winrt::Example::implementation {
         void OnDragLeave(
             const IInspectable& sender,
             const winrt::DragEventArgs& args);
-
+        fire_and_forget OnDrop(
+            const IInspectable& sender,
+            const winrt::DragEventArgs& args);
+        void OnDropCompleted(
+            const Windows::UI::Xaml::UIElement& sender,
+            const winrt::DropCompletedEventArgs& args);
 
         void DispatchCommand(
             winrt::Windows::UI::Xaml::FrameworkElement const& view,
@@ -84,6 +96,8 @@ namespace winrt::Example::implementation {
         winrt::event_revoker<winrt::IUIElement> m_dragEnterRevoker;
         winrt::event_revoker<winrt::IUIElement> m_dragOverRevoker;
         winrt::event_revoker<winrt::IUIElement> m_dragLeaveRevoker;
+        winrt::event_revoker<winrt::IUIElement> m_dropRevoker;
+        winrt::event_revoker<winrt::IUIElement> m_dropCompletedRevoker;
 
     };
 
