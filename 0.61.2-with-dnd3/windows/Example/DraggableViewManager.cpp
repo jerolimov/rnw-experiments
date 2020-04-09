@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "DragableViewManager.h"
+#include "DraggableViewManager.h"
 
 #include "JSValueReader.h"
 #include "NativeModules.h"
@@ -16,11 +16,11 @@ using namespace Windows::UI::Xaml::Controls;
 namespace winrt::Example::implementation {
 
     // IViewManager
-    hstring DragableViewManager::Name() noexcept {
-        return L"Dragable";
+    hstring DraggableViewManager::Name() noexcept {
+        return L"Draggable";
     }
 
-    FrameworkElement DragableViewManager::CreateView() noexcept {
+    FrameworkElement DraggableViewManager::CreateView() noexcept {
         auto const& view = winrt::Windows::UI::Xaml::Controls::Border();
 
         view.CanDrag(true);
@@ -31,25 +31,25 @@ namespace winrt::Example::implementation {
     //
     // IViewManagerWithChildren
     //
-    void DragableViewManager::AddView(FrameworkElement const& parent, UIElement const& child, int64_t /*index*/) noexcept {
+    void DraggableViewManager::AddView(FrameworkElement const& parent, UIElement const& child, int64_t /*index*/) noexcept {
         if (auto const& border = parent.try_as<Border>()) {
             border.Child(child);
         }
     }
 
-    void DragableViewManager::RemoveAllChildren(FrameworkElement const& parent) noexcept {
+    void DraggableViewManager::RemoveAllChildren(FrameworkElement const& parent) noexcept {
         if (auto const& border = parent.try_as<Border>()) {
             border.Child(nullptr);
         }
     }
 
-    void DragableViewManager::RemoveChildAt(FrameworkElement const& parent, int64_t /*index*/) noexcept {
+    void DraggableViewManager::RemoveChildAt(FrameworkElement const& parent, int64_t /*index*/) noexcept {
         if (auto const& border = parent.try_as<Border>()) {
             border.Child(nullptr);
         }
     }
 
-    void DragableViewManager::ReplaceChild(
+    void DraggableViewManager::ReplaceChild(
         FrameworkElement const& parent,
         UIElement const& /*oldChild*/,
         UIElement const& newChild) noexcept {
@@ -59,7 +59,7 @@ namespace winrt::Example::implementation {
     }
 
 
-    void DragableViewManager::DispatchCommand(
+    void DraggableViewManager::DispatchCommand(
         FrameworkElement const& view,
         int64_t commandId,
         winrt::Microsoft::ReactNative::IJSValueReader const& commandArgsReader) noexcept {

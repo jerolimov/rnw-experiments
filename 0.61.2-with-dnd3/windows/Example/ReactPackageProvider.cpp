@@ -3,8 +3,8 @@
 
 #include "NativeModules.h"
 
-#include "DragableViewManager.h"
-#include "DropableViewManager.h"
+#include "DraggableViewManager.h"
+#include "DroppableViewManager.h"
 
 using namespace winrt::Microsoft::ReactNative;
 
@@ -14,10 +14,10 @@ namespace winrt::Example::implementation
 void ReactPackageProvider::CreatePackage(IReactPackageBuilder const &packageBuilder) noexcept
 {
     packageBuilder.AddViewManager(
-        L"DragableViewManager", []() { return winrt::make<DragableViewManager>(); }
+        L"DraggableViewManager", []() { return winrt::make<DraggableViewManager>(); }
     );
     packageBuilder.AddViewManager(
-        L"DropableViewManager", []() { return winrt::make<DropableViewManager>(); }
+        L"DroppableViewManager", []() { return winrt::make<DroppableViewManager>(); }
     );
 
     AddAttributedModules(packageBuilder);

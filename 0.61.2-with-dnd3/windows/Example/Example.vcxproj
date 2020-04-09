@@ -102,8 +102,8 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="DragableViewManager.h" />
-    <ClInclude Include="DropableViewManager.h" />
+    <ClInclude Include="DraggableViewManager.h" />
+    <ClInclude Include="DroppableViewManager.h" />
     <ClInclude Include="ReactPackageProvider.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="App.h">
@@ -130,7 +130,7 @@
     <Image Include="Assets\Wide310x150Logo.scale-200.png" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="DropableViewManager.cpp" />
+    <ClCompile Include="DroppableViewManager.cpp" />
     <ClCompile Include="ReactPackageProvider.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
@@ -139,7 +139,7 @@
       <DependentUpon>App.xaml</DependentUpon>
     </ClCompile>
     <ClCompile Include="$(GeneratedFilesDir)module.g.cpp" />
-    <ClCompile Include="DragableViewManager.cpp" />
+    <ClCompile Include="DraggableViewManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Midl Include="App.idl">

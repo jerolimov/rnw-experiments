@@ -20,14 +20,14 @@ namespace winrt {
 
 namespace winrt::Example::implementation {
 
-    struct DropableViewManager : winrt::implements<
-        DropableViewManager,
+    struct DroppableViewManager : winrt::implements<
+        DroppableViewManager,
         winrt::Microsoft::ReactNative::IViewManager,
         winrt::Microsoft::ReactNative::IViewManagerWithReactContext,
         winrt::Microsoft::ReactNative::IViewManagerWithChildren,
         winrt::Microsoft::ReactNative::IViewManagerWithExportedEventTypeConstants> {
     public:
-        DropableViewManager() = default;
+        DroppableViewManager() = default;
 
         //
         // IViewManager

@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "DropableViewManager.h"
+#include "DroppableViewManager.h"
 
 #include "JSValueReader.h"
 #include "NativeModules.h"
@@ -30,11 +30,11 @@ namespace winrt::Example::implementation {
     //
     // IViewManager
     //
-    hstring DropableViewManager::Name() noexcept {
-        return L"Dropable";
+    hstring DroppableViewManager::Name() noexcept {
+        return L"Droppable";
     }
 
-    FrameworkElement DropableViewManager::CreateView() noexcept {
+    FrameworkElement DroppableViewManager::CreateView() noexcept {
         auto const& view = winrt::Windows::UI::Xaml::Controls::Border();
 
         // auto const& color = winrt::Windows::UI::Colors::Green();
@@ -48,19 +48,19 @@ namespace winrt::Example::implementation {
         // view.BorderThickness(winrt::Windows::UI::Xaml::Thickness());
 
         view.AllowDrop(true);
-        m_dragEnterRevoker = view.DragEnter(winrt::auto_revoke, { this, &DropableViewManager::OnDragEnter });
-        m_dragOverRevoker = view.DragOver(winrt::auto_revoke, { this, &DropableViewManager::OnDragOver });
-        m_dragLeaveRevoker = view.DragLeave(winrt::auto_revoke, { this, &DropableViewManager::OnDragLeave });
-        m_dropRevoker = view.Drop(winrt::auto_revoke, { this, &DropableViewManager::OnDrop });
+        m_dragEnterRevoker = view.DragEnter(winrt::auto_revoke, { this, &DroppableViewManager::OnDragEnter });
+        m_dragOverRevoker = view.DragOver(winrt::auto_revoke, { this, &DroppableViewManager::OnDragOver });
+        m_dragLeaveRevoker = view.DragLeave(winrt::auto_revoke, { this, &DroppableViewManager::OnDragLeave });
+        m_dropRevoker = view.Drop(winrt::auto_revoke, { this, &DroppableViewManager::OnDrop });
 
         // m_dropCompletedRevoker = 
-        view.DropCompleted(winrt::auto_revoke, { this, &DropableViewManager::OnDropCompleted });
+        view.DropCompleted(winrt::auto_revoke, { this, &DroppableViewManager::OnDropCompleted });
 
         
         return view;
     }
 
-    void DropableViewManager::OnDragEnter(
+    void DroppableViewManager::OnDragEnter(
         const IInspectable& sender,
         const DragEventArgs& args) {
 
@@ -78,7 +78,7 @@ namespace winrt::Example::implementation {
         }
     }
 
-    void DropableViewManager::OnDragOver(
+    void DroppableViewManager::OnDragOver(
         const IInspectable& sender,
         const DragEventArgs& args) {
 
@@ -95,7 +95,7 @@ namespace winrt::Example::implementation {
         }
     }
 
-    void DropableViewManager::OnDragLeave(
+    void DroppableViewManager::OnDragLeave(
         const IInspectable& sender,
         const DragEventArgs& args) {
 
@@ -110,7 +110,7 @@ namespace winrt::Example::implementation {
         }
     }
 
-    fire_and_forget DropableViewManager::OnDrop(
+    fire_and_forget DroppableViewManager::OnDrop(
         const IInspectable& sender,
         const DragEventArgs& args) {
 
@@ -181,7 +181,7 @@ namespace winrt::Example::implementation {
         }
     }
 
-    void DropableViewManager::OnDropCompleted(
+    void DroppableViewManager::OnDropCompleted(
         const Windows::UI::Xaml::UIElement& sender,
         const winrt::DropCompletedEventArgs& args) {
 
@@ -199,36 +199,36 @@ namespace winrt::Example::implementation {
     //
     // IViewManagerWithReactContext
     //
-    winrt::IReactContext DropableViewManager::ReactContext() noexcept {
+    winrt::IReactContext DroppableViewManager::ReactContext() noexcept {
         return m_reactContext;
     }
 
-    void DropableViewManager::ReactContext(IReactContext reactContext) noexcept {
+    void DroppableViewManager::ReactContext(IReactContext reactContext) noexcept {
         m_reactContext = reactContext;
     }
 
     //
     // IViewManagerWithChildren
     //
-    void DropableViewManager::AddView(FrameworkElement const& parent, UIElement const& child, int64_t /*index*/) noexcept {
+    void DroppableViewManager::AddView(FrameworkElement const& parent, UIElement const& child, int64_t /*index*/) noexcept {
         if (auto const& border = parent.try_as<Border>()) {
             border.Child(child);
         }
     }
 
-    void DropableViewManager::RemoveAllChildren(FrameworkElement const& parent) noexcept {
+    void DroppableViewManager::RemoveAllChildren(FrameworkElement const& parent) noexcept {
         if (auto const& border = parent.try_as<Border>()) {
             border.Child(nullptr);
         }
     }
 
-    void DropableViewManager::RemoveChildAt(FrameworkElement const& parent, int64_t /*index*/) noexcept {
+    void DroppableViewManager::RemoveChildAt(FrameworkElement const& parent, int64_t /*index*/) noexcept {
         if (auto const& border = parent.try_as<Border>()) {
             border.Child(nullptr);
         }
     }
 
-    void DropableViewManager::ReplaceChild(
+    void DroppableViewManager::ReplaceChild(
         FrameworkElement const& parent,
         UIElement const& /*oldChild*/,
         UIElement const& newChild) noexcept {
@@ -240,11 +240,11 @@ namespace winrt::Example::implementation {
     //
     // IViewManagerWithExportedEventTypeConstants
     //
-    ConstantProviderDelegate DropableViewManager::ExportedCustomBubblingEventTypeConstants() noexcept {
+    ConstantProviderDelegate DroppableViewManager::ExportedCustomBubblingEventTypeConstants() noexcept {
         return nullptr;
     }
 
-    ConstantProviderDelegate DropableViewManager::ExportedCustomDirectEventTypeConstants() noexcept {
+    ConstantProviderDelegate DroppableViewManager::ExportedCustomDirectEventTypeConstants() noexcept {
         return [](winrt::IJSValueWriter const& constantWriter) {
             WriteCustomDirectEventTypeConstant(constantWriter, L"topDragEnter", L"onDragEnter");
             WriteCustomDirectEventTypeConstant(constantWriter, L"topDragOver", L"onDragOver");
@@ -255,7 +255,7 @@ namespace winrt::Example::implementation {
     }
 
 
-    void DropableViewManager::DispatchCommand(
+    void DroppableViewManager::DispatchCommand(
         FrameworkElement const& view,
         int64_t commandId,
         winrt::Microsoft::ReactNative::IJSValueReader const& commandArgsReader) noexcept {

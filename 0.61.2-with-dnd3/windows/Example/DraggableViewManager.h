@@ -4,12 +4,12 @@
 
 namespace winrt::Example::implementation {
 
-    struct DragableViewManager : winrt::implements<
-        DragableViewManager,
+    struct DraggableViewManager : winrt::implements<
+        DraggableViewManager,
         winrt::Microsoft::ReactNative::IViewManager,
         winrt::Microsoft::ReactNative::IViewManagerWithChildren> {
     public:
-        DragableViewManager() = default;
+        DraggableViewManager() = default;
 
         // IViewManager
         winrt::hstring Name() noexcept;
