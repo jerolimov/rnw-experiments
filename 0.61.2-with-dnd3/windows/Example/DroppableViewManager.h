@@ -26,8 +26,9 @@ namespace winrt::Example::implementation {
         winrt::Microsoft::ReactNative::IViewManagerWithReactContext,
         winrt::Microsoft::ReactNative::IViewManagerWithChildren,
         winrt::Microsoft::ReactNative::IViewManagerWithExportedEventTypeConstants> {
+
     public:
-        DroppableViewManager() = default;
+        DroppableViewManager();
 
         //
         // IViewManager
@@ -64,25 +65,6 @@ namespace winrt::Example::implementation {
         winrt::Microsoft::ReactNative::ConstantProviderDelegate ExportedCustomBubblingEventTypeConstants() noexcept;
         winrt::Microsoft::ReactNative::ConstantProviderDelegate ExportedCustomDirectEventTypeConstants() noexcept;
 
-        //
-        // Drag and Drop callbacks
-        //
-        void OnDragEnter(
-            const IInspectable& sender,
-            const winrt::DragEventArgs& args);
-        void OnDragOver(
-            const IInspectable& sender,
-            const winrt::DragEventArgs& args);
-        void OnDragLeave(
-            const IInspectable& sender,
-            const winrt::DragEventArgs& args);
-        fire_and_forget OnDrop(
-            const IInspectable& sender,
-            const winrt::DragEventArgs& args);
-        void OnDropCompleted(
-            const Windows::UI::Xaml::UIElement& sender,
-            const winrt::DropCompletedEventArgs& args);
-
         void DispatchCommand(
             winrt::Windows::UI::Xaml::FrameworkElement const& view,
             int64_t commandId,
@@ -90,15 +72,8 @@ namespace winrt::Example::implementation {
 
 
     private:
-        // winrt::ReactNativeWebView::ReactWebView m_reactWebView{ nullptr };
         winrt::Microsoft::ReactNative::IReactContext m_reactContext{ nullptr };
-
-        winrt::event_revoker<winrt::IUIElement> m_dragEnterRevoker;
-        winrt::event_revoker<winrt::IUIElement> m_dragOverRevoker;
-        winrt::event_revoker<winrt::IUIElement> m_dragLeaveRevoker;
-        winrt::event_revoker<winrt::IUIElement> m_dropRevoker;
-        winrt::event_revoker<winrt::IUIElement> m_dropCompletedRevoker;
-
+        winrt::Windows::UI::Xaml::UIElement m_view{ nullptr };
     };
 
 }

@@ -13,6 +13,8 @@
     <ClCompile Include="ReactPackageProvider.cpp" />
     <ClCompile Include="DraggableViewManager.cpp" />
     <ClCompile Include="DroppableViewManager.cpp" />
+    <ClCompile Include="DraggableView.cpp" />
+    <ClCompile Include="DroppableView.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -20,6 +22,8 @@
     <ClInclude Include="ReactPackageProvider.h" />
     <ClInclude Include="DraggableViewManager.h" />
     <ClInclude Include="DroppableViewManager.h" />
+    <ClInclude Include="DraggableView.h" />
+    <ClInclude Include="DroppableView.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\Wide310x150Logo.scale-200.png">

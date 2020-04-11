@@ -102,7 +102,9 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="DraggableView.h" />
     <ClInclude Include="DraggableViewManager.h" />
+    <ClInclude Include="DroppableView.h" />
     <ClInclude Include="DroppableViewManager.h" />
     <ClInclude Include="ReactPackageProvider.h" />
     <ClInclude Include="pch.h" />
@@ -130,6 +132,8 @@
     <Image Include="Assets\Wide310x150Logo.scale-200.png" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="DraggableView.cpp" />
+    <ClCompile Include="DroppableView.cpp" />
     <ClCompile Include="DroppableViewManager.cpp" />
     <ClCompile Include="ReactPackageProvider.cpp" />
     <ClCompile Include="pch.cpp">

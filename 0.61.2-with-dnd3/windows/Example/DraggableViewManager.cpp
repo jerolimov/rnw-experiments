@@ -1,17 +1,30 @@
 #include "pch.h"
 #include "DraggableViewManager.h"
+#include "DraggableView.h"
 
 #include "JSValueReader.h"
 #include "NativeModules.h"
 
+// Only for testing the view with a background SolidColorBrush
+#include <winrt/Windows.UI.Xaml.Media.h>
+
+#include <winrt/Windows.ApplicationModel.DataTransfer.h>
+#include <winrt/Windows.ApplicationModel.DataTransfer.DragDrop.h>
+
+#include <winrt/Windows.Storage.h>
+
 using namespace winrt;
+
 using namespace Microsoft::ReactNative;
+
 using namespace Windows::Foundation;
 using namespace Windows::Foundation::Collections;
 
+using namespace Windows::UI;
 using namespace Windows::UI::Xaml;
 using namespace Windows::UI::Xaml::Media;
 using namespace Windows::UI::Xaml::Controls;
+using namespace Windows::UI::Xaml::Input;
 
 namespace winrt::Example::implementation {
 
@@ -21,11 +34,22 @@ namespace winrt::Example::implementation {
     }
 
     FrameworkElement DraggableViewManager::CreateView() noexcept {
-        auto const& view = winrt::Windows::UI::Xaml::Controls::Border();
+        // auto const& view = winrt::Windows::UI::Xaml::Controls::Border();
 
-        view.CanDrag(true);
+        auto const& view = DraggableView(m_reactContext);
 
         return view;
+    }
+
+    //
+    // IViewManagerWithReactContext
+    //
+    winrt::IReactContext DraggableViewManager::ReactContext() noexcept {
+        return m_reactContext;
+    }
+
+    void DraggableViewManager::ReactContext(IReactContext reactContext) noexcept {
+        m_reactContext = reactContext;
     }
 
     //
