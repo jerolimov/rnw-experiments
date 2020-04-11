@@ -1,45 +1,8 @@
 #include "pch.h"
-#include "NativeModules.h"
-
-#include <functional>
-#include <unknwn.h>
-
-#include <winrt/Windows.Foundation.Collections.h>
-#include <winrt/Windows.Foundation.h>
-#include <winrt/Windows.Media.Core.h>
-#include <winrt/Windows.Media.Playback.h>
-#include <winrt/Windows.System.Threading.h>
-#include <winrt/Windows.UI.Core.h>
-#include <winrt/Windows.UI.ViewManagement.h>
-#include <winrt/Windows.UI.Xaml.Controls.Primitives.h>
-#include <winrt/Windows.UI.Xaml.Controls.h>
-#include <winrt/Windows.UI.Xaml.Data.h>
-#include <winrt/Windows.UI.Xaml.Interop.h>
-#include <winrt/Windows.UI.Xaml.Markup.h>
-#include <winrt/Windows.UI.Xaml.Navigation.h>
-#include <winrt/Windows.UI.Xaml.h>
-#include <winrt/Windows.UI.Xaml.Input.h>
-#include <unknwn.h>
-#include <winrt/Windows.Foundation.Collections.h>
-#include <winrt/Windows.Foundation.h>
-#include <winrt/Windows.Media.Core.h>
-#include <winrt/Windows.Media.Playback.h>
-#include <winrt/Windows.System.Threading.h>
-#include <winrt/Windows.UI.Core.h>
-#include <winrt/Windows.UI.ViewManagement.h>
-#include <winrt/Windows.UI.Xaml.Controls.Primitives.h>
-#include <winrt/Windows.UI.Xaml.Controls.h>
-#include <winrt/Windows.UI.Xaml.Data.h>
-#include <winrt/Windows.UI.Xaml.Interop.h>
-#include <winrt/Windows.UI.Xaml.Markup.h>
-#include <winrt/Windows.UI.Xaml.Navigation.h>
-#include <winrt/Windows.UI.Xaml.h>
-#include <winrt/Windows.UI.Xaml.Input.h>
-
-#include <winrt/Microsoft.ReactNative.h>
-
 
 #include "DroppableView.h"
+
+#include <winrt/Microsoft.ReactNative.h>
 
 #include <winrt/Windows.Foundation.h>
 
@@ -50,7 +13,6 @@
 #include <winrt/Windows.ApplicationModel.DataTransfer.DragDrop.h>
 
 #include <winrt/Windows.Storage.h>
-#include <winrt/base.h>
 
 namespace winrt {
     using namespace Microsoft::ReactNative;
@@ -91,70 +53,6 @@ namespace winrt::Example::implementation {
         m_dropRevoker = m_view.Drop(winrt::auto_revoke, { this, &DroppableView::OnDrop });
         */
         // m_dropCompletedRevoker = m_view.DropCompleted(winrt::auto_revoke, { this, &DroppableView::OnDropCompleted });
-
-        // 1
-        // DragEnter(&DroppableView::OnDragEnter);
-
-        // 1
-
-        // 2
-        // m_dragEnterRevoker = DragEnter(winrt::auto_revoke, { this, &DroppableView::OnDragEnter });
-
-        // 3
-        /*
-        // DragEnter([&](auto const& sender, auto const& args) {
-            _RPT0(_CRT_WARN, "3\n");
-
-            auto color = m_reactContext == nullptr ? winrt::Colors::IndianRed() : winrt::Colors::BlueViolet();
-            auto brush = winrt::Windows::UI::Xaml::Media::SolidColorBrush(color);
-
-
-            auto self = const_cast<DroppableView>(this);
-
-            self.Background(brush);
-
-            // this->OnDragEnter(sender, args);
-        });
-        */
-
-        // 4
-        /*
-        m_dragEnterRevoker = DragEnter(winrt::auto_revoke, [&](auto const& sender, auto const& args) {
-            _RPT0(_CRT_WARN, "4\n");
-        });
-        */
-
-        /*
-        DragOver((auto const& sender, auto const& args) {
-            if (auto self = myimpl.get()) {
-                self->OnNavigationStarting(sender, args);
-            }
-        });
-        */
-
-        // winrt::com_ptr<DroppableView> myimpl = winrt::make_self<DroppableView>();
-
-        // auto const& x = winrt::make_self();
-        // x.get()
-
-        // auto weak_this{ get_weak() };
-
-        // m_navigationStartingRevoker = 
-
-
-        // m_dragEnterRevoker = DragEnter(winrt::auto_revoke, { this, &DroppableView::OnDragEnter });
-
-        /*
-        auto weak_this{ get_weak() };
-
-        // from react-native-video
-        m_dragEnterRevoker = DragOver(winrt::auto_revoke, [weak_this](auto const& sender, auto const& args) {
-            if (auto self = ref.get()) {
-                self->OnMediaOpened(sender, args);
-            }
-        });
-        */
-
     }
 
     void DroppableView::Release() {
@@ -310,13 +208,10 @@ namespace winrt::Example::implementation {
             });
     }
 
-
     void DroppableView::updateAcceptedOperation(const DragEventArgs& args) {
         auto dataView = args.DataView();
 
         if (dataView != nullptr) {
-            auto formats = dataView.AvailableFormats();
-
             if (dataView.Contains(L"FileDrop")) {
                 args.AcceptedOperation(winrt::Windows::ApplicationModel::DataTransfer::DataPackageOperation::Copy);
                 return;
