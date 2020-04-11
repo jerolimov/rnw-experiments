@@ -2,13 +2,40 @@
 
 #include "winrt/Microsoft.ReactNative.h"
 
+namespace winrt {
+	using namespace Microsoft::ReactNative;
+
+	using namespace Windows::Foundation;
+	using namespace Windows::Foundation::Collections;
+
+	using namespace Windows::UI;
+	using namespace Windows::UI::Xaml;
+	using namespace Windows::UI::Xaml::Controls;
+	using namespace Windows::UI::Xaml::Input;
+	using namespace Windows::UI::Xaml::Media;
+} // namespace winrt
+
 namespace winrt::Example::implementation {
-	class DraggableView : public winrt::Windows::UI::Xaml::Controls::Border {
+	struct DraggableView {
 
 	public:
 		DraggableView(Microsoft::ReactNative::IReactContext const& reactContext);
+		void Release();
+
+		winrt::FrameworkElement GetView();
+
+		//
+		// Drag and Drop callbacks
+		//
+		IAsyncAction OnDragStarting(
+			const winrt::UIElement& sender,
+			const winrt::DragStartingEventArgs& args);
 
 	private:
 		Microsoft::ReactNative::IReactContext m_reactContext{ nullptr };
+
+		winrt::Windows::UI::Xaml::Controls::Border m_view{ nullptr };
+
+		winrt::event_revoker<winrt::IUIElement> m_dragStartingRevoker;
 	};
 }

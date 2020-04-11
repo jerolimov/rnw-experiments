@@ -2,8 +2,6 @@
 
 #include "winrt/Microsoft.ReactNative.h"
 
-// #include "DroppableView.g.h"
-
 namespace winrt {
     using namespace Microsoft::ReactNative;
 
@@ -18,9 +16,7 @@ namespace winrt {
 } // namespace winrt
 
 namespace winrt::Example::implementation {
-    struct DroppableView /*: winrt::Windows::UI::Xaml::Controls::Border*/ {
-
-        // using Super = winrt::Windows::UI::Xaml::Controls::Border;
+    struct DroppableView {
 
 	public:
 		DroppableView(Microsoft::ReactNative::IReactContext const& reactContext);

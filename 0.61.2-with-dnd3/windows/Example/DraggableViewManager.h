@@ -24,7 +24,8 @@ namespace winrt::Example::implementation {
         DraggableViewManager,
         winrt::Microsoft::ReactNative::IViewManager,
         winrt::Microsoft::ReactNative::IViewManagerWithReactContext,
-        winrt::Microsoft::ReactNative::IViewManagerWithChildren> {
+        winrt::Microsoft::ReactNative::IViewManagerWithChildren,
+        winrt::Microsoft::ReactNative::IViewManagerWithExportedEventTypeConstants> {
     public:
         DraggableViewManager() = default;
 
@@ -55,6 +56,12 @@ namespace winrt::Example::implementation {
             winrt::Windows::UI::Xaml::FrameworkElement const& parent,
             winrt::Windows::UI::Xaml::UIElement const& oldChild,
             winrt::Windows::UI::Xaml::UIElement const& newChild) noexcept;
+
+        //
+        // IViewManagerWithExportedEventTypeConstants
+        //
+        winrt::Microsoft::ReactNative::ConstantProviderDelegate ExportedCustomBubblingEventTypeConstants() noexcept;
+        winrt::Microsoft::ReactNative::ConstantProviderDelegate ExportedCustomDirectEventTypeConstants() noexcept;
 
 
 

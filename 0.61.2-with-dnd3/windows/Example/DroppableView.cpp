@@ -69,9 +69,18 @@ namespace winrt::Example::implementation {
     void DroppableView::OnDragEnter(
         const IInspectable& sender,
         const DragEventArgs& args) {
+        _RPT0(_CRT_WARN, "DroppableView::OnDragEnter\n");
 
         args.Handled(true);
         updateAcceptedOperation(args);
+
+        auto dataView = args.DataView();
+        auto formats = dataView.AvailableFormats();
+
+        _RPT0(_CRT_WARN, "Formats:\n");
+        for (uint32_t i = 0; i < formats.Size(); i++) {
+            _RPT1(_CRT_WARN, "- %ls\n", formats.GetAt(i).c_str());
+        }
 
         auto color = winrt::Colors::Red();
         auto brush = winrt::Windows::UI::Xaml::Media::SolidColorBrush(color);
@@ -90,15 +99,21 @@ namespace winrt::Example::implementation {
         const IInspectable& sender,
         const DragEventArgs& args) {
 
-        if (auto const& view = sender.try_as<Border>()) {
-            m_reactContext.DispatchEvent(
-                view,
-                L"topDragOver",
-                [&](winrt::IJSValueWriter const& eventDataWriter) noexcept {
-                    eventDataWriter.WriteObjectBegin();
-                    eventDataWriter.WriteObjectEnd();
-                });
+        auto dataView = args.DataView();
+        auto formats = dataView.AvailableFormats();
+
+        _RPT0(_CRT_WARN, "Formats:\n");
+        for (uint32_t i = 0; i < formats.Size(); i++) {
+            _RPT1(_CRT_WARN, "- %ls\n", formats.GetAt(i).c_str());
         }
+
+        m_reactContext.DispatchEvent(
+            m_view,
+            L"topDragOver",
+            [&](winrt::IJSValueWriter const& eventDataWriter) noexcept {
+                eventDataWriter.WriteObjectBegin();
+                eventDataWriter.WriteObjectEnd();
+            });
     }
 
     void DroppableView::OnDragLeave(
@@ -137,7 +152,7 @@ namespace winrt::Example::implementation {
                 _RPT1(_CRT_WARN, "- %ls\n", formats.GetAt(i).c_str());
             }
 
-            if (dataView.Contains(L"FileDrop")) {
+            if (dataView.Contains(L"FileDrop") || dataView.Contains(L"CustomFileDrop")) {
                 try {
                     storageItems = co_await dataView.GetStorageItemsAsync();
 
@@ -184,12 +199,16 @@ namespace winrt::Example::implementation {
                 eventDataWriter.WriteObjectBegin();
                 eventDataWriter.WritePropertyName(L"files");
                 {
-                    eventDataWriter.WriteArrayBegin();
-                    for (uint32_t i = 0; i < storageItems.Size(); i++) {
-                        auto storageItem = storageItems.GetAt(i);
-                        eventDataWriter.WriteString(storageItem.Path());
+                    if (storageItems == nullptr) {
+                        eventDataWriter.WriteNull();
+                    } else {
+                        eventDataWriter.WriteArrayBegin();
+                        for (uint32_t i = 0; i < storageItems.Size(); i++) {
+                            auto storageItem = storageItems.GetAt(i);
+                            eventDataWriter.WriteString(storageItem.Path());
+                        }
+                        eventDataWriter.WriteArrayEnd();
                     }
-                    eventDataWriter.WriteArrayEnd();
                 }
                 eventDataWriter.WriteObjectEnd();
             });
@@ -212,12 +231,12 @@ namespace winrt::Example::implementation {
         auto dataView = args.DataView();
 
         if (dataView != nullptr) {
-            if (dataView.Contains(L"FileDrop")) {
+            if (dataView.Contains(L"FileDrop") || dataView.Contains(L"CustomFileDrop")) {
                 args.AcceptedOperation(winrt::Windows::ApplicationModel::DataTransfer::DataPackageOperation::Copy);
                 return;
             }
         }
 
-        args.AcceptedOperation(winrt::Windows::ApplicationModel::DataTransfer::DataPackageOperation::None);
+        args.AcceptedOperation(winrt::Windows::ApplicationModel::DataTransfer::DataPackageOperation::Copy);
     }
 }

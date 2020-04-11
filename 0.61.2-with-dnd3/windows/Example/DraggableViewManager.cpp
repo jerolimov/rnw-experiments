@@ -34,11 +34,17 @@ namespace winrt::Example::implementation {
     }
 
     FrameworkElement DraggableViewManager::CreateView() noexcept {
+        // *winrt::make_self<DroppableView>(m_reactContext);
+
         // auto const& view = winrt::Windows::UI::Xaml::Controls::Border();
 
-        auto const& view = DraggableView(m_reactContext);
+        // auto const& view = DroppableView(m_reactContext);
 
-        return view;
+        auto x = winrt::make_self<DraggableView>(m_reactContext);
+
+        m_view = x->GetView();
+
+        return x->GetView();
     }
 
     //
@@ -80,6 +86,19 @@ namespace winrt::Example::implementation {
         if (auto const& border = parent.try_as<Border>()) {
             border.Child(newChild);
         }
+    }
+
+    //
+    // IViewManagerWithExportedEventTypeConstants
+    //
+    ConstantProviderDelegate DraggableViewManager::ExportedCustomBubblingEventTypeConstants() noexcept {
+        return nullptr;
+    }
+
+    ConstantProviderDelegate DraggableViewManager::ExportedCustomDirectEventTypeConstants() noexcept {
+        return [](winrt::IJSValueWriter const& constantWriter) {
+            WriteCustomDirectEventTypeConstant(constantWriter, L"topDragStarting", L"onDragStarting");
+        };
     }
 
 
