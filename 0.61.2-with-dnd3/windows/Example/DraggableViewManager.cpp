@@ -98,6 +98,7 @@ namespace winrt::Example::implementation {
     ConstantProviderDelegate DraggableViewManager::ExportedCustomDirectEventTypeConstants() noexcept {
         return [](winrt::IJSValueWriter const& constantWriter) {
             WriteCustomDirectEventTypeConstant(constantWriter, L"topDragStarting", L"onDragStarting");
+            WriteCustomDirectEventTypeConstant(constantWriter, L"topDropCompleted", L"onDropCompleted");
         };
     }
 

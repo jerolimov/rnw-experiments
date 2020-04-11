@@ -30,6 +30,9 @@ namespace winrt::Example::implementation {
 		IAsyncAction OnDragStarting(
 			const winrt::UIElement& sender,
 			const winrt::DragStartingEventArgs& args);
+		void OnDropCompleted(
+			const winrt::UIElement& sender,
+			const winrt::DropCompletedEventArgs& args);
 
 	private:
 		Microsoft::ReactNative::IReactContext m_reactContext{ nullptr };

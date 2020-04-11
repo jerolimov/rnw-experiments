@@ -39,20 +39,16 @@ namespace winrt::Example::implementation {
         IAsyncAction OnDrop(
             const IInspectable& sender,
             const winrt::DragEventArgs& args);
-        void OnDropCompleted(
-            const Windows::UI::Xaml::UIElement& sender,
-            const winrt::DropCompletedEventArgs& args);
 
 	private:
         Microsoft::ReactNative::IReactContext m_reactContext{ nullptr };
 
         winrt::Windows::UI::Xaml::Controls::Border m_view{ nullptr };
 
-        winrt::event_revoker<winrt::IUIElement> m_dragEnterRevoker;
-        winrt::event_revoker<winrt::IUIElement> m_dragOverRevoker;
-        winrt::event_revoker<winrt::IUIElement> m_dragLeaveRevoker;
-        winrt::event_revoker<winrt::IUIElement> m_dropRevoker;
-        winrt::event_revoker<winrt::IUIElement> m_dropCompletedRevoker;
+        winrt::event_revoker<winrt::IInspectable> m_dragEnterRevoker;
+        winrt::event_revoker<winrt::IInspectable> m_dragOverRevoker;
+        winrt::event_revoker<winrt::IInspectable> m_dragLeaveRevoker;
+        winrt::event_revoker<winrt::IInspectable> m_dropRevoker;
 
         void updateAcceptedOperation(const winrt::DragEventArgs& args);
     };

@@ -44,7 +44,6 @@ namespace winrt::Example::implementation {
         m_view.DragOver({ this, &DroppableView::OnDragOver });
         m_view.DragLeave({ this, &DroppableView::OnDragLeave });
         m_view.Drop({ this, &DroppableView::OnDrop });
-        m_view.DropCompleted({ this, &DroppableView::OnDropCompleted });
 
         /*
         m_dragEnterRevoker = m_view.DragEnter(winrt::auto_revoke, { this, &DroppableView::OnDragEnter });
@@ -52,7 +51,6 @@ namespace winrt::Example::implementation {
         m_dragLeaveRevoker = m_view.DragLeave(winrt::auto_revoke, { this, &DroppableView::OnDragLeave });
         m_dropRevoker = m_view.Drop(winrt::auto_revoke, { this, &DroppableView::OnDrop });
         */
-        // m_dropCompletedRevoker = m_view.DropCompleted(winrt::auto_revoke, { this, &DroppableView::OnDropCompleted });
     }
 
     void DroppableView::Release() {
@@ -98,6 +96,7 @@ namespace winrt::Example::implementation {
     void DroppableView::OnDragOver(
         const IInspectable& sender,
         const DragEventArgs& args) {
+        _RPT0(_CRT_WARN, "DroppableView::OnDragOver\n");
 
         auto dataView = args.DataView();
         auto formats = dataView.AvailableFormats();
@@ -119,6 +118,7 @@ namespace winrt::Example::implementation {
     void DroppableView::OnDragLeave(
         const IInspectable& sender,
         const DragEventArgs& args) {
+        _RPT0(_CRT_WARN, "DroppableView::OnDragLeave\n");
 
         auto color = winrt::Colors::Green();
         auto brush = winrt::Windows::UI::Xaml::Media::SolidColorBrush(color);
@@ -136,6 +136,7 @@ namespace winrt::Example::implementation {
     IAsyncAction DroppableView::OnDrop(
         const IInspectable& sender,
         const DragEventArgs& args) {
+        _RPT0(_CRT_WARN, "DroppableView::OnDrop\n");
 
         // TODO: args.Handled(true);
 
@@ -190,8 +191,6 @@ namespace winrt::Example::implementation {
 
         }
 
-        
-
         m_reactContext.DispatchEvent(
             m_view,
             L"topDrop",
@@ -210,19 +209,6 @@ namespace winrt::Example::implementation {
                         eventDataWriter.WriteArrayEnd();
                     }
                 }
-                eventDataWriter.WriteObjectEnd();
-            });
-    }
-
-    void DroppableView::OnDropCompleted(
-        const Windows::UI::Xaml::UIElement& sender,
-        const winrt::DropCompletedEventArgs& args) {
-
-        m_reactContext.DispatchEvent(
-            m_view,
-            L"topDropCompleted",
-            [&](winrt::IJSValueWriter const& eventDataWriter) noexcept {
-                eventDataWriter.WriteObjectBegin();
                 eventDataWriter.WriteObjectEnd();
             });
     }

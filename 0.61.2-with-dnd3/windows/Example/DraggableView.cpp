@@ -41,9 +41,11 @@ namespace winrt::Example::implementation {
 
         m_view.CanDrag(true);
         m_view.DragStarting({ this, &DraggableView::OnDragStarting });
+        m_view.DropCompleted({ this, &DraggableView::OnDropCompleted });
 
         /*
         m_dragStartingRevoker = m_view.DragStarting(winrt::auto_revoke, { this, &DraggableView::OnDragStarting });
+        m_dropCompletedRevoker = m_view.DropCompleted(winrt::auto_revoke, { this, &DraggableView::OnDropCompleted });
         */
     }
 
@@ -74,10 +76,16 @@ namespace winrt::Example::implementation {
 
         std::vector<winrt::Windows::Storage::IStorageItem> files{ file };
 
-        args.Data().SetData(L"FileDrop", winrt::box_value(L"custom?!"));
+        args.Data().SetStorageItems(files);
+
+        // args.Data().AddStorageItems(file);
+
+        // args.Data().SetData(L"FileDrop", winrt::box_value(L"custom?!"));
         args.Data().SetData(L"CustomFileDrop", winrt::box_value(L"custom?!"));
 
-        args.Data().SetStorageItems(files);
+        auto storageItemsKey = winrt::Windows::ApplicationModel::DataTransfer::StandardDataFormats::StorageItems;
+
+        // TODO??? args.Data().SetDataProvider()
 
         /*
         winrt::Windows::Foundation::Collections::IVectorView<winrt::Windows::Storage::IStorageItem> storageItems = {
@@ -95,4 +103,20 @@ namespace winrt::Example::implementation {
             });
     }
 
+    void DraggableView::OnDropCompleted(
+        const winrt::UIElement& sender,
+        const winrt::DropCompletedEventArgs& args) {
+
+        _RPT0(_CRT_WARN, "DraggableView::OnDropCompleted\n");
+
+        auto result = args.DropResult();
+
+        m_reactContext.DispatchEvent(
+            m_view,
+            L"topDropCompleted",
+            [&](winrt::IJSValueWriter const& eventDataWriter) noexcept {
+                eventDataWriter.WriteObjectBegin();
+                eventDataWriter.WriteObjectEnd();
+            });
+    }
 }
