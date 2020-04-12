@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -6,12 +6,30 @@ import {
   Text,
   StatusBar,
   requireNativeComponent,
+  TouchableWithoutFeedback,
+  TouchableOpacity,
 } from 'react-native';
 
 const Draggable = requireNativeComponent('Draggable');
 const Droppable = requireNativeComponent('Droppable');
 
+function createInitialState() {
+  const result = [];
+
+  for (let a = 0; a < 10; a++) {
+    result[a] = [];
+    for (let b = 0; b < 10; b++) {
+      result[a][b] = a + b;
+    }
+  }
+  return result;
+}
+
+console.log(createInitialState())
+
 export default function App() {
+  const [numbers, forceUpdate] = useState(createInitialState)
+
   return (
     <>
       <StatusBar barStyle="dark-content" />
@@ -24,6 +42,20 @@ export default function App() {
             </View>
           )}
 
+          <View style={{ margin: 30 }}>
+            {
+              numbers.map((_, a) => (
+                <View key={a} style={{ flexDirection: 'row' }}>
+                  {
+                    numbers.map((_, b) => (
+                      <Box key={b} a={a} b={b} content={numbers[a][b]} />
+                    ))
+                  }
+                </View>
+              ))
+            }
+          </View>
+
           <Draggable
             // onMouseEnter={() => console.warn('onMouseEnter')}
             // onMouseMove={() => console.warn('onMouseMove')}
@@ -31,9 +63,8 @@ export default function App() {
 
             allowDrag
             onDragStart={(event) => console.warn('onDragStart', event)}
-            onDrag={(event) => console.warn('onDrag', event)}
-            onDragEnd={(event) => console.warn('onDragEnd', event)}
-
+            onDragStarting={(event) => console.warn('onDragStarting', event)}
+            onDropCompleted={(event) => console.warn('onDropCompleted', event.nativeEvent)}
             style={{ padding: 30, margin: 30, borderWidth: 2, borderColor: 'red', backgroundColor: '#e0e0e0' }}
           >
             <Text>Drag me #1</Text>
@@ -52,8 +83,6 @@ export default function App() {
               console.warn('onDrop', Object.keys(event).join(', '));
               console.warn('onDrop nativeEvent:', JSON.stringify(event.nativeEvent));
             }}
-            onDropCompleted={(event) => console.warn('onDropCompleted', event.nativeEvent)}
-
             style={{ padding: 30, margin: 30, borderWidth: 2, borderColor: 'red', backgroundColor: '#e0e0e0' }}
           >
             <Text>Drop here #1a</Text>
@@ -68,9 +97,10 @@ export default function App() {
             onDragEnter={(event) => console.warn('onDragEnter', event.nativeEvent)}
             onDragOver={(event) => console.warn('onDragOver', event.nativeEvent)}
             onDragLeave={(event) => console.warn('onDragLeave', event.nativeEvent)}
-            onDrop={(event) => console.warn('onDrop', event.nativeEvent)}
-            onDropCompleted={(event) => console.warn('onDropCompleted', event.nativeEvent)}
-
+            onDrop={(event) => {
+              console.warn('onDrop', Object.keys(event).join(', '));
+              console.warn('onDrop nativeEvent:', JSON.stringify(event.nativeEvent));
+            }}
             style={{ padding: 30, margin: 30, borderWidth: 2, borderColor: 'red', backgroundColor: '#e0e0e0' }}
           >
             <Text>Drop here #2b</Text>
@@ -81,3 +111,28 @@ export default function App() {
     </>
   );
 };
+
+function Box({ a, b, content }) {
+  const [selected, setSelected] = useState(false)
+
+  const size = 70;
+  const backgroundColor = selected ? '#bbdefb' : 'transparent';
+  const borderColor = 'gray';
+
+  const allowDrag = content > 0;
+  const allowDrop = content < 10;
+
+  return (
+    <Droppable>
+      <TouchableOpacity
+        onPress={() => console.warn('onPress inner')}
+        style={{ width: size, height: size, borderWidth: 1, borderColor, backgroundColor }}
+      >
+        <Text>{a},{b} = {content}</Text>
+        <Text>drag={allowDrag ? 'true' : 'false'}</Text>
+        <Text>drop={allowDrop ? 'true' : 'false'}</Text>
+      </TouchableOpacity>
+    </Droppable>
+  )
+
+}

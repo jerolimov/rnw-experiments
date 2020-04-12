@@ -27,12 +27,14 @@ namespace winrt::Example::implementation {
 		//
 		// Drag and Drop callbacks
 		//
-		IAsyncAction OnDragStarting(
+		void OnDragStarting(
 			const winrt::UIElement& sender,
 			const winrt::DragStartingEventArgs& args);
 		void OnDropCompleted(
 			const winrt::UIElement& sender,
 			const winrt::DropCompletedEventArgs& args);
+		fire_and_forget OnDataRequested(
+			Windows::ApplicationModel::DataTransfer::DataProviderRequest const& request);
 
 	private:
 		Microsoft::ReactNative::IReactContext m_reactContext{ nullptr };

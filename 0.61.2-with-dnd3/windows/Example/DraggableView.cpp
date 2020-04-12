@@ -35,13 +35,15 @@ namespace winrt::Example::implementation {
 
         m_view = winrt::Windows::UI::Xaml::Controls::Border();
 
-        auto const& color = winrt::Colors::AliceBlue();
+        auto const& color = winrt::Colors::Green();
         auto const& brush = winrt::Windows::UI::Xaml::Media::SolidColorBrush(color);
         m_view.Background(brush);
 
         m_view.CanDrag(true);
         m_view.DragStarting({ this, &DraggableView::OnDragStarting });
         m_view.DropCompleted({ this, &DraggableView::OnDropCompleted });
+
+        // m_view.Click({ this, &DraggableView::OnDropCompleted });
 
         /*
         m_dragStartingRevoker = m_view.DragStarting(winrt::auto_revoke, { this, &DraggableView::OnDragStarting });
@@ -60,7 +62,7 @@ namespace winrt::Example::implementation {
     //
     // Drag and drop callbacks
     //
-    IAsyncAction DraggableView::OnDragStarting(
+    void DraggableView::OnDragStarting(
         const winrt::UIElement& sender,
         const winrt::DragStartingEventArgs& args) {
 
@@ -70,29 +72,55 @@ namespace winrt::Example::implementation {
         auto brush = winrt::Windows::UI::Xaml::Media::SolidColorBrush(color);
         m_view.Background(brush);
 
-        auto file = co_await winrt::Windows::Storage::StorageFile::GetFileFromPathAsync(L"C:\git\\rnw-experiments\\0.61.2-with-dnd3\\package.json");
-        auto uri = co_await winrt::Windows::Storage::StorageFile::GetFileFromApplicationUriAsync(Windows::Foundation::Uri(L"example:///unknown_file.xml"));
-        auto folder = co_await winrt::Windows::Storage::StorageFolder::GetFolderFromPathAsync(L"C:\git\\rnw-experiments\\0.61.2-with-dnd3\\node_modules");
+        // auto file = co_await winrt::Windows::Storage::StorageFile::GetFileFromPathAsync(L"C:\git\\rnw-experiments\\0.61.2-with-dnd3\\package.json");
+        // auto uri = co_await winrt::Windows::Storage::StorageFile::GetFileFromApplicationUriAsync(Windows::Foundation::Uri(L"example:///unknown_file.xml"));
+        // auto folder = co_await winrt::Windows::Storage::StorageFolder::GetFolderFromPathAsync(L"C:\git\\rnw-experiments\\0.61.2-with-dnd3\\node_modules");
 
-        std::vector<winrt::Windows::Storage::IStorageItem> files{ file };
+        // std::vector<winrt::Windows::Storage::IStorageItem> files{ file };
+        
 
-        args.Data().SetStorageItems(files);
+        auto const& data = args.Data();
 
-        // args.Data().AddStorageItems(file);
+        // args.AllowedOperations(winrt::Windows::ApplicationModel::DataTransfer::DataPackageOperation::Copy);
 
-        // args.Data().SetData(L"FileDrop", winrt::box_value(L"custom?!"));
-        args.Data().SetData(L"CustomFileDrop", winrt::box_value(L"custom?!"));
+        data.RequestedOperation(winrt::Windows::ApplicationModel::DataTransfer::DataPackageOperation::Copy);
 
-        auto storageItemsKey = winrt::Windows::ApplicationModel::DataTransfer::StandardDataFormats::StorageItems;
-
-        // TODO??? args.Data().SetDataProvider()
+        // data.SetText(L"Hello world!");
 
         /*
-        winrt::Windows::Foundation::Collections::IVectorView<winrt::Windows::Storage::IStorageItem> storageItems = {
-            file,
-            uri,,
-        };
+        data.Properties().FileTypes().Append(L"");
+
+        data.SetData(L"Shell IDList Array", winrt::box_value(L"custom?!"));
+        data.SetData(L"UsingDefaultDragImage", winrt::box_value(L"custom?!"));
+        data.SetData(L"DragImageBits", winrt::box_value(L"custom?!"));
+        data.SetData(L"DragContext", winrt::box_value(L"custom?!"));
+        data.SetData(L"DragSourceHelperFlags", winrt::box_value(L"custom?!"));
+        data.SetData(L"InShellDragLoop", winrt::box_value(L"custom?!"));
+        data.SetData(L"FileDrop", winrt::box_value(L"custom?!"));
+        data.SetData(L"FileName", winrt::box_value(L"custom?!"));
+        data.SetData(L"FileContents", winrt::box_value(L"custom?!"));
+        data.SetData(L"FileNameW", winrt::box_value(L"custom?!"));
+        data.SetData(L"FileGroupDescriptorW", winrt::box_value(L"custom?!"));
+        data.SetData(L"IsShowingLayered", winrt::box_value(L"custom?!"));
+        data.SetData(L"DragWindow", winrt::box_value(L"custom?!"));
+        data.SetData(L"IsComputingImage", winrt::box_value(L"custom?!"));
+        data.SetData(L"DropDescription", winrt::box_value(L"custom?!"));
+        data.SetData(L"DisableDragText", winrt::box_value(L"custom?!"));
+        data.SetData(L"ComputedDragImage", winrt::box_value(L"custom?!"));
+        data.SetData(L"IsShowingText", winrt::box_value(L"custom?!"));
         */
+
+        // data.SetStorageItems(files);
+
+        // data.AddStorageItems(file);
+    
+        // TODO??? data.SetDataProvider()
+
+        // auto storageItemsKey = winrt::Windows::ApplicationModel::DataTransfer::StandardDataFormats::Text;
+
+        data.SetDataProvider(L"Text", { this, &DraggableView::OnDataRequested });
+        
+        // data.ShareCompleted???
 
         m_reactContext.DispatchEvent(
             m_view,
@@ -109,6 +137,10 @@ namespace winrt::Example::implementation {
 
         _RPT0(_CRT_WARN, "DraggableView::OnDropCompleted\n");
 
+        auto color = winrt::Colors::Green();
+        auto brush = winrt::Windows::UI::Xaml::Media::SolidColorBrush(color);
+        m_view.Background(brush);
+
         auto result = args.DropResult();
 
         m_reactContext.DispatchEvent(
@@ -118,5 +150,36 @@ namespace winrt::Example::implementation {
                 eventDataWriter.WriteObjectBegin();
                 eventDataWriter.WriteObjectEnd();
             });
+    }
+
+    fire_and_forget DraggableView::OnDataRequested(
+        Windows::ApplicationModel::DataTransfer::DataProviderRequest const& request) {
+
+        _RPT0(_CRT_WARN, "DraggableView::OnDataRequested\n");
+
+        auto deferral = request.GetDeferral();
+
+        
+
+        try {
+            _RPT0(_CRT_WARN, "load file async...\n");
+            // auto file = co_await winrt::Windows::Storage::StorageFile::GetFileFromPathAsync(L"C:\git\\rnw-experiments\\0.61.2-with-dnd3\\package.json");
+            // auto folder = co_await winrt::Windows::Storage::StorageFolder::GetFolderFromPathAsync(L"C:\git\\rnw-experiments\\0.61.2-with-dnd3\\node_modules");
+
+            auto picturesLibrary = co_await winrt::Windows::Storage::KnownFolders::GetFolderForUserAsync(nullptr /* current user */, winrt::Windows::Storage::KnownFolderId::PicturesLibrary);
+
+            // Windows::Storage::StorageFolder folder{ co_await Windows::Storage::StorageFolder::GetFolderFromPathAsync(L"C:\git\\rnw-experiments\\0.61.2-with-dnd3\\node_modules") };
+
+            _RPT0(_CRT_WARN, "load file done\n");
+        }
+        catch (const hresult_error& ex) {
+            _RPT0(_CRT_WARN, "load file failed\n");
+        }
+
+        _RPT0(_CRT_WARN, "setData\n");
+
+        request.SetData(winrt::box_value(L"hallo"));
+
+        deferral.Complete();
     }
 }
