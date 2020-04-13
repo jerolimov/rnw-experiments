@@ -153,32 +153,52 @@ namespace winrt::Example::implementation {
     }
 
     fire_and_forget DraggableView::OnDataRequested(
-        Windows::ApplicationModel::DataTransfer::DataProviderRequest const& request) {
+        Windows::ApplicationModel::DataTransfer::DataProviderRequest const request) {
 
         _RPT0(_CRT_WARN, "DraggableView::OnDataRequested\n");
 
         auto deferral = request.GetDeferral();
 
-        
+        auto file2 = co_await winrt::Windows::Storage::StorageFile::GetFileFromPathAsync(L"C:\git\\rnw-experiments\\0.61.2-with-dnd3\\package.json");
 
         try {
             _RPT0(_CRT_WARN, "load file async...\n");
-            // auto file = co_await winrt::Windows::Storage::StorageFile::GetFileFromPathAsync(L"C:\git\\rnw-experiments\\0.61.2-with-dnd3\\package.json");
-            // auto folder = co_await winrt::Windows::Storage::StorageFolder::GetFolderFromPathAsync(L"C:\git\\rnw-experiments\\0.61.2-with-dnd3\\node_modules");
-
-            auto picturesLibrary = co_await winrt::Windows::Storage::KnownFolders::GetFolderForUserAsync(nullptr /* current user */, winrt::Windows::Storage::KnownFolderId::PicturesLibrary);
-
-            // Windows::Storage::StorageFolder folder{ co_await Windows::Storage::StorageFolder::GetFolderFromPathAsync(L"C:\git\\rnw-experiments\\0.61.2-with-dnd3\\node_modules") };
-
+            auto file = co_await winrt::Windows::Storage::StorageFile::GetFileFromPathAsync(L"C:\git\\rnw-experiments\\0.61.2-with-dnd3\\package.json");
             _RPT0(_CRT_WARN, "load file done\n");
         }
         catch (const hresult_error& ex) {
+            _RPT1(_CRT_WARN, "load file failed: %ls\n", L"asd");
+
+            _RPT2(_CRT_WARN, "load file failed: %u %ls\n", ex.code(), ex.message().c_str());
             _RPT0(_CRT_WARN, "load file failed\n");
         }
 
-        _RPT0(_CRT_WARN, "setData\n");
+        /*
+        try {
+            _RPT0(_CRT_WARN, "load folder async...\n");
+            auto folder = co_await winrt::Windows::Storage::StorageFolder::GetFolderFromPathAsync(L"C:\git\\rnw-experiments\\0.61.2-with-dnd3\\node_modules");
+            _RPT0(_CRT_WARN, "load folder done\n");
+        }
+        catch (const hresult_error& ex) {
+            _RPT0(_CRT_WARN, "load folder failed\n");
+        }
 
-        request.SetData(winrt::box_value(L"hallo"));
+        try {
+            _RPT0(_CRT_WARN, "load picturesLibrary async...\n");
+            auto picturesLibrary = co_await winrt::Windows::Storage::KnownFolders::GetFolderForUserAsync(nullptr, winrt::Windows::Storage::KnownFolderId::PicturesLibrary);
+            _RPT0(_CRT_WARN, "load picturesLibrary done\n");
+        }
+        catch (const hresult_error& ex) {
+            _RPT0(_CRT_WARN, "load picturesLibrary failed\n");
+        }
+        */
+
+        if (request == nullptr) {
+            _RPT0(_CRT_WARN, "request is nullptr\n");
+        } else {
+            _RPT0(_CRT_WARN, "setData\n");
+            request.SetData(winrt::box_value(L"hallo"));
+        }
 
         deferral.Complete();
     }

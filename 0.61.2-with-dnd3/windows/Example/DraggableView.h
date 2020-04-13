@@ -34,7 +34,7 @@ namespace winrt::Example::implementation {
 			const winrt::UIElement& sender,
 			const winrt::DropCompletedEventArgs& args);
 		fire_and_forget OnDataRequested(
-			Windows::ApplicationModel::DataTransfer::DataProviderRequest const& request);
+			Windows::ApplicationModel::DataTransfer::DataProviderRequest const request);
 
 	private:
 		Microsoft::ReactNative::IReactContext m_reactContext{ nullptr };
