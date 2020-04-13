@@ -1,9 +1,10 @@
 #include "pch.h"
 
 #include "App.h"
-#include "ReactPackageProvider.h"
 
+// #include "ReactPackageProvider.h"
 
+/// #include "../../react-native-fs/windows/RNFS/|"
 
 using namespace winrt::Example;
 using namespace winrt::Example::implementation;
@@ -36,6 +37,8 @@ App::App() noexcept
     PackageProviders().Append(make<ReactPackageProvider>()); // Includes all modules in this project
 
     REACT_REGISTER_NATIVE_MODULE_PACKAGES(); //code-gen macro from autolink
+
+    PackageProviders().Append(RNFS::RNFSPackage);
 
     InitializeComponent();
 
