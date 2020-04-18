@@ -1,5 +1,7 @@
 #pragma once
 
+#include <functional>
+
 #include "winrt/Microsoft.ReactNative.h"
 
 namespace winrt {
@@ -30,17 +32,22 @@ namespace winrt::Example::implementation {
 		void OnDragStarting(
 			const winrt::UIElement& sender,
 			const winrt::DragStartingEventArgs& args);
+		fire_and_forget OnDataRequested(
+			Windows::ApplicationModel::DataTransfer::DataProviderRequest const request);
 		void OnDropCompleted(
 			const winrt::UIElement& sender,
 			const winrt::DropCompletedEventArgs& args);
-		fire_and_forget OnDataRequested(
-			Windows::ApplicationModel::DataTransfer::DataProviderRequest const request);
 
 	private:
 		Microsoft::ReactNative::IReactContext m_reactContext{ nullptr };
 
 		winrt::Windows::UI::Xaml::Controls::Border m_view{ nullptr };
 
+		winrt::Windows::UI::Core::CoreDispatcher m_uiDispatcher{ nullptr };
+
 		winrt::event_revoker<winrt::IUIElement> m_dragStartingRevoker;
+
+		void DispatchEvent(param::hstring const& eventName, Microsoft::ReactNative::JSValueArgWriter const& eventDataArgWriter);
+		void DispatchEventOnUIThread(param::hstring const& eventName, Microsoft::ReactNative::JSValueArgWriter const& eventDataArgWriter);
 	};
 }

@@ -9,11 +9,15 @@
 // Only for testing the view with a background SolidColorBrush
 #include <winrt/Windows.UI.Xaml.Media.h>
 
+#include <winrt/Windows.UI.Core.h>
+
 #include <winrt/Windows.ApplicationModel.DataTransfer.h>
 #include <winrt/Windows.ApplicationModel.DataTransfer.DragDrop.h>
 
 #include <winrt/Windows.Storage.h>
 #include <winrt/Windows.Storage.Provider.h>
+
+#include <unknwn.h>
 
 namespace winrt {
     using namespace Microsoft::ReactNative;
@@ -32,6 +36,7 @@ namespace winrt::Example::implementation {
         _RPT0(_CRT_WARN, "DroppableView::Constructor\n");
 
         m_reactContext = reactContext;
+        m_uiDispatcher = winrt::Windows::UI::Core::CoreWindow::GetForCurrentThread().Dispatcher();
 
         m_view = winrt::Windows::UI::Xaml::Controls::Border();
 
@@ -68,20 +73,15 @@ namespace winrt::Example::implementation {
 
         _RPT0(_CRT_WARN, "DraggableView::OnDragStarting\n");
 
-        auto color = winrt::Colors::Red();
-        auto brush = winrt::Windows::UI::Xaml::Media::SolidColorBrush(color);
-        m_view.Background(brush);
-
         // auto file = co_await winrt::Windows::Storage::StorageFile::GetFileFromPathAsync(L"C:\git\\rnw-experiments\\0.61.2-with-dnd3\\package.json");
         // auto uri = co_await winrt::Windows::Storage::StorageFile::GetFileFromApplicationUriAsync(Windows::Foundation::Uri(L"example:///unknown_file.xml"));
         // auto folder = co_await winrt::Windows::Storage::StorageFolder::GetFolderFromPathAsync(L"C:\git\\rnw-experiments\\0.61.2-with-dnd3\\node_modules");
 
         // std::vector<winrt::Windows::Storage::IStorageItem> files{ file };
         
-
         auto const& data = args.Data();
 
-        // args.AllowedOperations(winrt::Windows::ApplicationModel::DataTransfer::DataPackageOperation::Copy);
+        args.AllowedOperations(winrt::Windows::ApplicationModel::DataTransfer::DataPackageOperation::Copy);
 
         data.RequestedOperation(winrt::Windows::ApplicationModel::DataTransfer::DataPackageOperation::Copy);
 
@@ -122,34 +122,13 @@ namespace winrt::Example::implementation {
         
         // data.ShareCompleted???
 
-        m_reactContext.DispatchEvent(
-            m_view,
+        DispatchEvent(
             L"topDragStarting",
             [&](winrt::IJSValueWriter const& eventDataWriter) noexcept {
                 eventDataWriter.WriteObjectBegin();
                 eventDataWriter.WriteObjectEnd();
-            });
-    }
-
-    void DraggableView::OnDropCompleted(
-        const winrt::UIElement& sender,
-        const winrt::DropCompletedEventArgs& args) {
-
-        _RPT0(_CRT_WARN, "DraggableView::OnDropCompleted\n");
-
-        auto color = winrt::Colors::Green();
-        auto brush = winrt::Windows::UI::Xaml::Media::SolidColorBrush(color);
-        m_view.Background(brush);
-
-        auto result = args.DropResult();
-
-        m_reactContext.DispatchEvent(
-            m_view,
-            L"topDropCompleted",
-            [&](winrt::IJSValueWriter const& eventDataWriter) noexcept {
-                eventDataWriter.WriteObjectBegin();
-                eventDataWriter.WriteObjectEnd();
-            });
+            }
+        );
     }
 
     fire_and_forget DraggableView::OnDataRequested(
@@ -159,7 +138,35 @@ namespace winrt::Example::implementation {
 
         auto deferral = request.GetDeferral();
 
-        auto file2 = co_await winrt::Windows::Storage::StorageFile::GetFileFromPathAsync(L"C:\git\\rnw-experiments\\0.61.2-with-dnd3\\package.json");
+        // auto file2 = co_await winrt::Windows::Storage::StorageFile::GetFileFromPathAsync(L"C:\git\\rnw-experiments\\0.61.2-with-dnd3\\package.json");
+
+            /*
+        try {
+            _RPT0(_CRT_WARN, "installedLocation path??\n");
+
+            Windows::Storage::StorageFolder installedLocation {
+                Windows::ApplicationModel::Package::Current().InstalledLocation()
+            };
+            _RPT1(_CRT_WARN, "installedLocation path 1: %ls\n", installedLocation.Path().c_str());
+
+            Windows::Storage::StorageFolder installedLocation2 {
+                Windows::ApplicationModel::Package::Current().InstalledLocation()
+            };
+
+            _RPT1(_CRT_WARN, "installedLocation path 2: %ls\n", installedLocation2.Path().c_str());
+
+            Windows::Storage::StorageFolder installedLocation2 = Windows::ApplicationModel::Package::Current().InstalledLocation();
+
+            _RPT1(_CRT_WARN, "installedLocation path 3: %ls\n", installedLocation3.Path().c_str());
+            _RPT1(_CRT_WARN, "installedLocation path 4: %ls\n", installedLocation4.Path().c_str());
+        }
+        catch (const hresult_error& ex) {
+            _RPT1(_CRT_WARN, "test failed: %ls\n", L"asd");
+
+            _RPT2(_CRT_WARN, "test failed: %u %ls\n", ex.code(), ex.message().c_str());
+            _RPT0(_CRT_WARN, "test failed\n");
+        }
+            */
 
         try {
             _RPT0(_CRT_WARN, "load file async...\n");
@@ -195,11 +202,59 @@ namespace winrt::Example::implementation {
 
         if (request == nullptr) {
             _RPT0(_CRT_WARN, "request is nullptr\n");
-        } else {
+        }
+        else {
             _RPT0(_CRT_WARN, "setData\n");
             request.SetData(winrt::box_value(L"hallo"));
         }
 
+        DispatchEventOnUIThread(
+            L"topDropRequested",
+            [&](winrt::IJSValueWriter const& eventDataWriter) noexcept {
+                eventDataWriter.WriteObjectBegin();
+                eventDataWriter.WriteObjectEnd();
+            }
+        );
+
+        Sleep(500);
+
         deferral.Complete();
+    }
+
+    void DraggableView::OnDropCompleted(
+        const winrt::UIElement& sender,
+        const winrt::DropCompletedEventArgs& args) {
+
+        _RPT0(_CRT_WARN, "DraggableView::OnDropCompleted\n");
+
+        auto result = args.DropResult();
+
+        DispatchEvent(
+            L"topDropCompleted",
+            [&](winrt::IJSValueWriter const& eventDataWriter) noexcept {
+                eventDataWriter.WriteObjectBegin();
+                eventDataWriter.WriteObjectEnd();
+            }
+        );
+    }
+
+    void DraggableView::DispatchEvent(
+        param::hstring const& eventName,
+        Microsoft::ReactNative::JSValueArgWriter const& eventDataArgWriter
+    ) {
+        m_reactContext.DispatchEvent(m_view, eventName, eventDataArgWriter);
+    }
+
+    void DraggableView::DispatchEventOnUIThread(
+        param::hstring const& eventName,
+        Microsoft::ReactNative::JSValueArgWriter const& eventDataArgWriter
+    ) {
+        m_uiDispatcher.RunAsync(
+            winrt::Windows::UI::Core::CoreDispatcherPriority::Normal,
+            // https://stackoverflow.com/questions/26903602/an-enclosing-function-local-variable-cannot-be-referenced-in-a-lambda-body-unles
+            [&]() {
+                DispatchEvent(eventName, eventDataArgWriter);
+            }
+        );
     }
 }

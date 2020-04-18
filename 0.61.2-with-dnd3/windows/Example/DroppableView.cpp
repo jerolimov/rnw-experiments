@@ -28,7 +28,7 @@ namespace winrt {
 namespace winrt::Example::implementation {
 
     DroppableView::DroppableView(winrt::IReactContext const& reactContext) {
-        _RPT0(_CRT_WARN, "DroppableView::Constructor\n");
+        // _RPT0(_CRT_WARN, "DroppableView::Constructor\n");
 
         m_reactContext = reactContext;
 
@@ -54,7 +54,7 @@ namespace winrt::Example::implementation {
     }
 
     void DroppableView::Release() {
-        _RPT0(_CRT_WARN, "DroppableView::Release\n");
+        // _RPT0(_CRT_WARN, "DroppableView::Release\n");
     }
 
     winrt::FrameworkElement DroppableView::GetView() {
@@ -90,7 +90,8 @@ namespace winrt::Example::implementation {
             [&](winrt::IJSValueWriter const& eventDataWriter) noexcept {
                 eventDataWriter.WriteObjectBegin();
                 eventDataWriter.WriteObjectEnd();
-            });
+            }
+        );
     }
 
     void DroppableView::OnDragOver(
@@ -112,7 +113,8 @@ namespace winrt::Example::implementation {
             [&](winrt::IJSValueWriter const& eventDataWriter) noexcept {
                 eventDataWriter.WriteObjectBegin();
                 eventDataWriter.WriteObjectEnd();
-            });
+            }
+        );
     }
 
     void DroppableView::OnDragLeave(
@@ -130,7 +132,8 @@ namespace winrt::Example::implementation {
             [&](winrt::IJSValueWriter const& eventDataWriter) noexcept {
                 eventDataWriter.WriteObjectBegin();
                 eventDataWriter.WriteObjectEnd();
-            });
+            }
+        );
     }
 
     IAsyncAction DroppableView::OnDrop(
@@ -210,7 +213,8 @@ namespace winrt::Example::implementation {
                     }
                 }
                 eventDataWriter.WriteObjectEnd();
-            });
+            }
+        );
     }
 
     void DroppableView::updateAcceptedOperation(const DragEventArgs& args) {
