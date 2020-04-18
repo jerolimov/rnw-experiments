@@ -220,12 +220,31 @@ namespace winrt::Example::implementation {
 
         _RPT0(_CRT_WARN, "DraggableView::OnDropCompleted\n");
 
-        auto result = args.DropResult();
-
         DispatchEvent(
             L"topDropCompleted",
             [&](winrt::IJSValueWriter const& eventDataWriter) noexcept {
                 eventDataWriter.WriteObjectBegin();
+
+                eventDataWriter.WritePropertyName(L"result");
+                switch (args.DropResult())
+                {
+                case winrt::Windows::ApplicationModel::DataTransfer::DataPackageOperation::None:
+                    eventDataWriter.WriteString(L"none");
+                    break;
+                case winrt::Windows::ApplicationModel::DataTransfer::DataPackageOperation::Copy:
+                    eventDataWriter.WriteString(L"copy");
+                    break;
+                case winrt::Windows::ApplicationModel::DataTransfer::DataPackageOperation::Move:
+                    eventDataWriter.WriteString(L"move");
+                    break;
+                case winrt::Windows::ApplicationModel::DataTransfer::DataPackageOperation::Link:
+                    eventDataWriter.WriteString(L"link");
+                    break;
+                default:
+                    eventDataWriter.WriteString(L"unknown");
+                    break;
+                }
+
                 eventDataWriter.WriteObjectEnd();
             }
         );
