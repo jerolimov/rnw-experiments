@@ -6,9 +6,6 @@
 
 #include <winrt/Windows.Foundation.h>
 
-// Only for testing the view with a background SolidColorBrush
-#include <winrt/Windows.UI.Xaml.Media.h>
-
 #include <winrt/Windows.UI.Core.h>
 
 #include <winrt/Windows.ApplicationModel.DataTransfer.h>
@@ -39,10 +36,6 @@ namespace winrt::Example::implementation {
         m_uiDispatcher = winrt::Windows::UI::Core::CoreWindow::GetForCurrentThread().Dispatcher();
 
         m_view = winrt::Windows::UI::Xaml::Controls::Border();
-
-        auto const& color = winrt::Colors::Green();
-        auto const& brush = winrt::Windows::UI::Xaml::Media::SolidColorBrush(color);
-        m_view.Background(brush);
 
         m_view.CanDrag(true);
         m_view.DragStarting({ this, &DraggableView::OnDragStarting });
