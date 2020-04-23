@@ -13,6 +13,8 @@
 
 #include <winrt/Windows.Storage.h>
 #include <winrt/Windows.Storage.Provider.h>
+#include <winrt/Windows.Storage.Streams.h>
+#include <winrt/Windows.Storage.Pickers.h>
 
 #include <unknwn.h>
 #include <list>
@@ -112,12 +114,6 @@ namespace winrt::Example::implementation {
 
         // auto storageItemsKey = winrt::Windows::ApplicationModel::DataTransfer::StandardDataFormats::Text;
 
-        /*
-        data.SetDataProvider(
-            winrt::Windows::ApplicationModel::DataTransfer::StandardDataFormats::Text(),
-            { this, &DraggableView::OnDataRequested }
-        );
-        */
         data.SetDataProvider(
             winrt::Windows::ApplicationModel::DataTransfer::StandardDataFormats::StorageItems(),
             { this, &DraggableView::OnDataRequested }
@@ -133,7 +129,7 @@ namespace winrt::Example::implementation {
             }
         );
     }
-
+        
     fire_and_forget DraggableView::OnDataRequested(
         Windows::ApplicationModel::DataTransfer::DataProviderRequest const request
     ) {
@@ -144,10 +140,11 @@ namespace winrt::Example::implementation {
 
         _RPT1(_CRT_WARN, "- formatId: %sl\n", formatId);
 
-        Sleep(500);
+        Sleep(3000);
 
         // auto file2 = co_await winrt::Windows::Storage::StorageFile::GetFileFromPathAsync(L"C:\git\\rnw-experiments\\0.61.2-with-dnd3\\package.json");
 
+        /*
         try {
             _RPT0(_CRT_WARN, "installedLocation path??\n");
 
@@ -163,53 +160,51 @@ namespace winrt::Example::implementation {
             _RPT2(_CRT_WARN, "installedLocation failed: %i %ls\n", ex.code(), ex.message().c_str());
             _RPT2(_CRT_WARN, "installedLocation failed: %u %ls\n", ex.code(), ex.message().c_str());
         }
+        */
 
         try {
             _RPT0(_CRT_WARN, "load file async...\n");
 
             // auto file = co_await winrt::Windows::Storage::StorageFile::GetFileFromPathAsync(L"C:\git\\rnw-experiments\\0.61.2-with-dnd3\\package.json");
-
             // auto file = { co_await winrt::Windows::Storage::StorageFile::GetFileFromPathAsync(L"C:\git\\rnw-experiments\\0.61.2-with-dnd3\\package.json") };
 
-            auto const& localFolder = Windows::Storage::ApplicationData::Current().LocalFolder();
-
+            auto localFolder = Windows::Storage::ApplicationData::Current().LocalFolder();
             _RPT1(_CRT_WARN, "localFolder: %ls\n", localFolder.Path().c_str());
 
-            auto const& file = co_await localFolder.CreateFileAsync(L"sample.txt", Windows::Storage::CreationCollisionOption::ReplaceExisting);
-
-            _RPT1(_CRT_WARN, "file: %ls\n", file.Path().c_str());
-
-            co_await Windows::Storage::FileIO::WriteTextAsync(file, L"Swift as a shadow");
+            // auto tempFile = co_await localFolder.CreateFileAsync(L"sample.txt", Windows::Storage::CreationCollisionOption::ReplaceExisting);
+            // _RPT1(_CRT_WARN, "file: %ls\n", tempFile.Path().c_str());
+            // co_await Windows::Storage::FileIO::WriteTextAsync(tempFile, L"Test Text!");
 
 
+            auto files = co_await localFolder.GetFilesAsync();
 
-            std::vector<winrt::Windows::Storage::IStorageItem> files{ file };
+            _RPT0(_CRT_WARN, "files selected\n");
+            _RPT1(_CRT_WARN, "files count: %i\n", files.Size());
+            // _RPT1(_CRT_WARN, "files count: %ls\n", files.First().Current().Path().c_str());
 
-            Windows::Foundation::Collections::IVector<winrt::Windows::Storage::IStorageItem> &coll{ winrt::single_threaded_vector<winrt::Windows::Storage::IStorageItem>() };
+            // std::array<Windows::Storage::IStorageItem, 1> storageFiles = { tempFile };
+
+            // IVectorView<Windows::Storage::IStorageItem> pickedFiles = co_await filePicker.PickMultipleFilesAsync();
+            // requestData.SetStorageItems(storageItems.as<IIterable<IStorageItem>>());
+
+
+            // _RPT1(_CRT_WARN, "files count: %i\n", storageItems.Size());
+            // _RPT1(_CRT_WARN, "files count: %ls\n", storageItems.First().Current().Path().c_str());
+
+            m_data = winrt::Windows::ApplicationModel::DataTransfer::DataPackage();
+
+            // m_data.SetStorageItems({ storageFiles.begin(), storageFiles.end() });
             
-            coll.Append(file);
+            m_data.SetStorageItems(files.as<IIterable<Windows::Storage::IStorageItem>>());
 
-
-            // auto files = winrt::param::vector({ file });
-
-            // auto items = winrt::single_threaded_vector<StorageItem>();
-
-            auto data = winrt::Windows::ApplicationModel::DataTransfer::DataPackage();
-
-            // data.SetStorageItems({ file });
-            data.SetStorageItems(coll);
-
-            auto x = co_await data.GetView().GetStorageItemsAsync();
-
+            
+            auto x = co_await m_data.GetView().GetStorageItemsAsync();
             _RPT1(_CRT_WARN, "files count: %i\n", x.Size());
             _RPT1(_CRT_WARN, "files count: %ls\n", x.First().Current().Path().c_str());
 
 
-            // data.AddStoage
+            request.SetData(files);
 
-            request.SetData(data);
-
-            // request.AddStorageItems(items);
 
             _RPT0(_CRT_WARN, "load file done\n");
         }
@@ -241,6 +236,7 @@ namespace winrt::Example::implementation {
         _RPT0(_CRT_WARN, "setData\n");
         // request.SetData(winrt::box_value(L"hallo"));
 
+        /*
         DispatchEventOnUIThread(
             L"topDropRequested",
             [&](winrt::IJSValueWriter const& eventDataWriter) noexcept {
@@ -248,6 +244,7 @@ namespace winrt::Example::implementation {
                 eventDataWriter.WriteObjectEnd();
             }
         );
+        */
 
         deferral.Complete();
     }

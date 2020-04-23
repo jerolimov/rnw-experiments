@@ -47,6 +47,8 @@ namespace winrt::Example::implementation {
 
 		winrt::event_revoker<winrt::IUIElement> m_dragStartingRevoker;
 
+		winrt::Windows::ApplicationModel::DataTransfer::DataPackage m_data;
+
 		void DispatchEvent(param::hstring const& eventName, Microsoft::ReactNative::JSValueArgWriter const& eventDataArgWriter);
 		void DispatchEventOnUIThread(param::hstring const& eventName, Microsoft::ReactNative::JSValueArgWriter const& eventDataArgWriter);
 	};
