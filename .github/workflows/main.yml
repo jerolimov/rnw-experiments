@@ -10,6 +10,7 @@ jobs:
     - uses: actions/setup-node@v1
     - uses: microsoft/setup-msbuild@v1.0.0
     - uses: nuget/setup-nuget@v1
+    - run: MSBuild version
     - name: npm install
       run: npm install
       working-directory: 0.60.0-vnext
@@ -21,6 +22,8 @@ jobs:
     - name: react-native run-windows --no-deploy --no-launch --logging
       run: npm run react-native -- run-windows --no-deploy --no-launch --logging
       working-directory: 0.60.0-vnext
+      env:
+        VisualStudioVersion: "16.5.0.12403"
 
   build-0_61_0-beta:
     runs-on: windows-latest
