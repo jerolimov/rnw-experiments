@@ -15,8 +15,8 @@ jobs:
     - name: react-native run-windows --info
       run: npm run react-native -- run-windows --info
       working-directory: 0.60.0-vnext
-    - name: react-native run-windows --no-deploy --no-launch
-      run: npm run react-native -- run-windows --no-deploy --no-launch
+    - name: react-native run-windows --no-deploy --no-launch --logging
+      run: npm run react-native -- run-windows --no-deploy --no-launch --logging
       working-directory: 0.60.0-vnext
 
   build-0_61_0-beta:
@@ -31,8 +31,8 @@ jobs:
     - name: react-native run-windows --info
       run: npm run react-native -- run-windows --info
       working-directory: 0.61.0-beta
-    - name: react-native run-windows --no-deploy --no-launch
-      run: npm run react-native -- run-windows --no-deploy --no-launch
+    - name: react-native run-windows --no-deploy --no-launch --logging
+      run: npm run react-native -- run-windows --no-deploy --no-launch --logging
       working-directory: 0.61.0-beta
 
   build-0_61_2:
@@ -47,8 +47,8 @@ jobs:
     - name: react-native run-windows --info
       run: npm run react-native -- run-windows --info
       working-directory: 0.61.2
-    - name: react-native run-windows --no-deploy --no-launch
-      run: npm run react-native -- run-windows --no-deploy --no-launch
+    - name: react-native run-windows --no-deploy --no-launch --logging
+      run: npm run react-native -- run-windows --no-deploy --no-launch --logging
       working-directory: 0.61.2
 
   build-0_60_0-with-dnd:
@@ -63,8 +63,8 @@ jobs:
     - name: react-native run-windows --info
       run: npm run react-native -- run-windows --info
       working-directory: 0.60.0-with-dnd
-    - name: react-native run-windows --no-deploy --no-launch
-      run: npm run react-native -- run-windows --no-deploy --no-launch
+    - name: react-native run-windows --no-deploy --no-launch --logging
+      run: npm run react-native -- run-windows --no-deploy --no-launch --logging
       working-directory: 0.60.0-with-dnd
 
   build-0_61_2-with-dnd:
@@ -79,8 +79,8 @@ jobs:
     - name: react-native run-windows --info
       run: npm run react-native -- run-windows --info
       working-directory: 0.61.2-with-dnd
-    - name: react-native run-windows --no-deploy --no-launch
-      run: npm run react-native -- run-windows --no-deploy --no-launch
+    - name: react-native run-windows --no-deploy --no-launch --logging
+      run: npm run react-native -- run-windows --no-deploy --no-launch --logging
       working-directory: 0.61.2-with-dnd
 
   build-0_61_2-with-dnd2:
@@ -95,8 +95,8 @@ jobs:
     - name: react-native run-windows --info
       run: npm run react-native -- run-windows --info
       working-directory: 0.61.2-with-dnd2
-    - name: react-native run-windows --no-deploy --no-launch
-      run: npm run react-native -- run-windows --no-deploy --no-launch
+    - name: react-native run-windows --no-deploy --no-launch --logging
+      run: npm run react-native -- run-windows --no-deploy --no-launch --logging
       working-directory: 0.61.2-with-dnd2
 
   build-0_61_2-with-dnd3:
@@ -111,8 +111,8 @@ jobs:
     - name: react-native run-windows --info
       run: npm run react-native -- run-windows --info
       working-directory: 0.61.2-with-dnd3
-    - name: react-native run-windows --no-deploy --no-launch
-      run: npm run react-native -- run-windows --no-deploy --no-launch
+    - name: react-native run-windows --no-deploy --no-launch --logging
+      run: npm run react-native -- run-windows --no-deploy --no-launch --logging
       working-directory: 0.61.2-with-dnd3
 
   build-0_61_2-with-webview:
@@ -127,8 +127,8 @@ jobs:
     - name: react-native run-windows --info
       run: npm run react-native -- run-windows --info
       working-directory: 0.61.2-with-webview
-    - name: react-native run-windows --no-deploy --no-launch
-      run: npm run react-native -- run-windows --no-deploy --no-launch
+    - name: react-native run-windows --no-deploy --no-launch --logging
+      run: npm run react-native -- run-windows --no-deploy --no-launch --logging
       working-directory: 0.61.2-with-webview
 
   build-0_61_9:
@@ -143,8 +143,8 @@ jobs:
     - name: react-native run-windows --info
       run: npm run react-native -- run-windows --info
       working-directory: 0.61.9
-    - name: react-native run-windows --no-deploy --no-launch
-      run: npm run react-native -- run-windows --no-deploy --no-launch
+    - name: react-native run-windows --no-deploy --no-launch --logging
+      run: npm run react-native -- run-windows --no-deploy --no-launch --logging
       working-directory: 0.61.9
 
   build-0_61_9-with-fs:
@@ -159,8 +159,8 @@ jobs:
     - name: react-native run-windows --info
       run: npm run react-native -- run-windows --info
       working-directory: 0.61.9-with-fs
-    - name: react-native run-windows --no-deploy --no-launch
-      run: npm run react-native -- run-windows --no-deploy --no-launch
+    - name: react-native run-windows --no-deploy --no-launch --logging
+      run: npm run react-native -- run-windows --no-deploy --no-launch --logging
       working-directory: 0.61.9-with-fs
 
   build-0_61_9-with-fs2:
@@ -175,6 +175,6 @@ jobs:
     - name: react-native run-windows --info
       run: npm run react-native -- run-windows --info
       working-directory: 0.61.9-with-fs2
-    - name: react-native run-windows --no-deploy --no-launch
-      run: npm run react-native -- run-windows --no-deploy --no-launch
+    - name: react-native run-windows --no-deploy --no-launch --logging
+      run: npm run react-native -- run-windows --no-deploy --no-launch --logging
       working-directory: 0.61.9-with-fs2
